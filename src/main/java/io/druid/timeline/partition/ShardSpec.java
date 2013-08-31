@@ -27,15 +27,6 @@ import java.util.Map;
 /**
  * A Marker interface that exists to combine ShardSpec objects together for Jackson
  */
-@JsonTypeInfo(use= JsonTypeInfo.Id.NAME, property="type", include= JsonTypeInfo.As.PROPERTY)
-/*
-@JsonSubTypes({
-    @JsonSubTypes.Type(name="single", value=SingleDimensionShardSpec.class),
-    @JsonSubTypes.Type(name="none", value=NoneShardSpec.class),
-    @JsonSubTypes.Type(name="linear", value=LinearShardSpec.class),
-    @JsonSubTypes.Type(name="numbered", value=NumberedShardSpec.class)
-})
- */
 public interface ShardSpec
 {
   public <T> PartitionChunk<T> createChunk(T obj);

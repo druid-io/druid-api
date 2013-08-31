@@ -8,5 +8,5 @@ import java.util.List;
  */
 public interface DruidModule extends com.google.inject.Module
 {
-  public List<Module> getJacksonModules();
+  public List<? extends Module> getJacksonModules();
 }
