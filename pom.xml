@@ -27,25 +27,10 @@
             <artifactId>java-util</artifactId>
             <version>0.25.0-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>com.metamx</groupId>
-            <artifactId>bytebuffer-collections</artifactId>
-            <version>0.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.metamx</groupId>
-            <artifactId>emitter</artifactId>
-            <version>0.2.5-SNAPSHOT</version>
-        </dependency>
 
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
-            <version>4.0-beta</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.inject.extensions</groupId>
-            <artifactId>guice-multibindings</artifactId>
             <version>4.0-beta</version>
         </dependency>
 
