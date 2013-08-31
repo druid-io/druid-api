@@ -1,6 +1,6 @@
 /*
  * Druid - a distributed column store.
- * Copyright (C) 2012  Metamarkets Group Inc.
+ * Copyright (C) 2012, 2013  Metamarkets Group Inc.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,22 +17,31 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package io.druid.query.spec;
+package io.druid.data.input;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import io.druid.query.Query;
-import io.druid.query.QueryRunner;
-import io.druid.query.QuerySegmentWalker;
-import org.joda.time.Interval;
+import com.google.common.collect.Maps;
+import com.metamx.common.ISE;
 
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  */
-@JsonTypeInfo(use= JsonTypeInfo.Id.NAME, property="type", defaultImpl = LegacySegmentSpec.class)
-public interface QuerySegmentSpec
+public class Rows
 {
-  public List<Interval> getIntervals();
+  public static InputRow toCaseInsensitiveInputRow(final Row row, final List<String> dimensions)
+  {
+    if (row instanceof MapBasedRow) {
+      MapBasedRow mapBasedRow = (MapBasedRow) row;
 
-  public <T> QueryRunner<T> lookup(Query<T> query, QuerySegmentWalker walker);
+      TreeMap<String, Object> caseInsensitiveMap = Maps.newTreeMap(String.CASE_INSENSITIVE_ORDER);
+      caseInsensitiveMap.putAll(mapBasedRow.getEvent());
+      return new MapBasedInputRow(
+          mapBasedRow.getTimestampFromEpoch(),
+          dimensions,
+          caseInsensitiveMap
+      );
+    }
+    throw new ISE("Can only convert MapBasedRow objects because we are ghetto like that.");
+  }
 }

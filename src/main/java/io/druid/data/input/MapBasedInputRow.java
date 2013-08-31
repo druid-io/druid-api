@@ -1,6 +1,6 @@
 /*
  * Druid - a distributed column store.
- * Copyright (C) 2012  Metamarkets Group Inc.
+ * Copyright (C) 2012, 2013  Metamarkets Group Inc.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,17 +17,42 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package io.druid.query;
+package io.druid.data.input;
 
-import io.druid.segment.Segment;
+import org.joda.time.DateTime;
 
-import java.util.concurrent.ExecutorService;
+import java.util.List;
+import java.util.Map;
 
 /**
  */
-public interface QueryRunnerFactory<T, QueryType extends Query<T>>
+public class MapBasedInputRow extends MapBasedRow implements InputRow
 {
-  public QueryRunner<T> createRunner(Segment segment);
-  public QueryRunner<T> mergeRunners(ExecutorService queryExecutor, Iterable<QueryRunner<T>> queryRunners);
-  public QueryToolChest<T, QueryType> getToolchest();
+  private final List<String> dimensions;
+
+  public MapBasedInputRow(
+      long timestamp,
+      List<String> dimensions,
+      Map<String, Object> event
+  )
+  {
+    super(timestamp, event);
+    this.dimensions = dimensions;
+  }
+
+  @Override
+  public List<String> getDimensions()
+  {
+    return dimensions;
+  }
+
+  @Override
+  public String toString()
+  {
+    return "MapBasedInputRow{" +
+           "timestamp=" + new DateTime(getTimestampFromEpoch()) +
+           ", event=" + getEvent() +
+           ", dimensions=" + dimensions +
+           '}';
+  }
 }
