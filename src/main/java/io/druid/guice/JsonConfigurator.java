@@ -96,7 +96,15 @@ public class JsonConfigurator
       }
     }
 
-    final T config = jsonMapper.convertValue(jsonMap, clazz);
+    final T config;
+    try {
+      config = jsonMapper.convertValue(jsonMap, clazz);
+    }
+    catch (IllegalArgumentException e) {
+      throw new ProvisionException(
+          String.format("Problem parsing object at prefix[%s]: %s.", propertyPrefix, e.getMessage()), e
+      );
+    }
 
     final Set<ConstraintViolation<T>> violations = validator.validate(config);
     if (!violations.isEmpty()) {
