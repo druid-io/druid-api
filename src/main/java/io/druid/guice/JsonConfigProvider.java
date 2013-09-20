@@ -32,7 +32,7 @@ import java.util.Properties;
 
 
 /**
- * Provides a singleton value of type {@code <T>} from {@code Properties} bound to gson.
+ * Provides a singleton value of type {@code <T>} from {@code Properties} bound in guice.
  * <br/>
  * <h3>Usage</h3>
  * To install this provider, bind it in your guice module, like below.
@@ -49,6 +49,29 @@ import java.util.Properties;
  * The state of {@code <T>} is defined by the value of the property {@code propertyBase}.
  * This value is a json structure, decoded via {@link JsonConfigurator#configurate(java.util.Properties, String, Class)}.
  * <br/>
+ *
+ * An example might be if DruidServerConfig.class were
+ *
+ * <pre>
+ *   public class DruidServerConfig
+ *   {
+ *     @JsonProperty @NotNull public String hostname = null;
+ *     @JsonProperty @Min(1025) public int port = 8080;
+ *   }
+ * </pre>
+ *
+ * And your Properties object had in it
+ *
+ * <pre>
+ *   druid.server.hostname=0.0.0.0
+ *   druid.server.port=3333
+ * </pre>
+ *
+ * Then this would bind a singleton instance of a DruidServerConfig object with hostname = "0.0.0.0" and port = 3333.
+ *
+ * If the port weren't set in the properties, then the default of 8080 would be taken.  Essentially, it is the same as
+ * subtracting the "druid.server" prefix from the properties and building a Map which is then passed into
+ * ObjectMapper.convertValue()
  *
  * @param <T> type of config object to provide.
  */
