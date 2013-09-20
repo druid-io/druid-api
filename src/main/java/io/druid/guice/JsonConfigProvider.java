@@ -30,7 +30,27 @@ import com.google.inject.util.Types;
 import java.lang.annotation.Annotation;
 import java.util.Properties;
 
+
 /**
+ * Provides a singleton value of type {@code <T>} from {@code Properties} bound to gson.
+ * <br/>
+ * <h3>Usage</h3>
+ * To install this provider, bind it in your guice module, like below.
+ *
+ * <pre>
+ * JsonConfigProvider.bind(binder, "druid.server", DruidServerConfig.class);
+ * </pre>
+ * <br/>
+ * In the above case, {@code druid.server} should be a key found in the {@code Properties} bound elsewhere.
+ * The value of that key should directly relate to the fields in {@code DruidServerConfig.class}.
+ *
+ * <h3>Implementation</h3>
+ * <br/>
+ * The state of {@code <T>} is defined by the value of the property {@code propertyBase}.
+ * This value is a json structure, decoded via {@link JsonConfigurator#configurate(java.util.Properties, String, Class)}.
+ * <br/>
+ *
+ * @param <T> type of config object to provide.
  */
 public class JsonConfigProvider<T> implements Provider<Supplier<T>>
 {
