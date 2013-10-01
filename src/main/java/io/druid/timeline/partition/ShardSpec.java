@@ -19,10 +19,7 @@
 
 package io.druid.timeline.partition;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.druid.data.input.InputRow;
-
-import java.util.Map;
 
 /**
  * A Marker interface that exists to combine ShardSpec objects together for Jackson
@@ -30,7 +27,6 @@ import java.util.Map;
 public interface ShardSpec
 {
   public <T> PartitionChunk<T> createChunk(T obj);
-  public boolean isInChunk(Map<String, String> dimensions);
   public boolean isInChunk(InputRow inputRow);
   public int getPartitionNum();
 }

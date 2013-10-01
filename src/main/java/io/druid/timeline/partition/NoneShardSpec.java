@@ -20,9 +20,6 @@
 package io.druid.timeline.partition;
 
 import io.druid.data.input.InputRow;
-import io.druid.timeline.partition.SingleElementPartitionChunk;
-
-import java.util.Map;
 
 /**
  */
@@ -32,12 +29,6 @@ public class NoneShardSpec implements ShardSpec
   public <T> PartitionChunk<T> createChunk(T obj)
   {
     return new SingleElementPartitionChunk<T>(obj);
-  }
-
-  @Override
-  public boolean isInChunk(Map<String, String> dimensions)
-  {
-    return true;
   }
 
   @Override
