@@ -7,5 +7,6 @@ import java.io.IOException;
 
 public interface DataSegmentPusher
 {
+  public String getPathForHadoop(String dataSource);
   public DataSegment push(File file, DataSegment segment) throws IOException;
 }

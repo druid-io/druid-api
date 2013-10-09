@@ -9,6 +9,7 @@ import com.google.inject.Provider;
 import com.google.inject.util.Types;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
 import java.util.Properties;
 
 
@@ -110,6 +111,31 @@ public class JsonConfigProvider<T> implements Provider<Supplier<T>>
   {
     binder.bind(supplierKey).toProvider((Provider) of(propertyBase, clazz)).in(LazySingleton.class);
     binder.bind(instanceKey).toProvider(new SupplierProvider<T>(supplierKey));
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> void bindInstance(
+      Binder binder,
+      Key<T> bindKey,
+      T instance
+  )
+  {
+    binder.bind(bindKey).toInstance(instance);
+
+    final ParameterizedType supType = Types.newParameterizedType(Supplier.class, bindKey.getTypeLiteral().getType());
+    final Key supplierKey;
+
+    if (bindKey.getAnnotationType() != null) {
+      supplierKey = Key.get(supType, bindKey.getAnnotationType());
+    }
+    else if (bindKey.getAnnotation() != null) {
+      supplierKey = Key.get(supType, bindKey.getAnnotation());
+    }
+    else {
+      supplierKey = Key.get(supType);
+    }
+
+    binder.bind(supplierKey).toInstance(Suppliers.<T>ofInstance(instance));
   }
 
   public static <T> JsonConfigProvider<T> of(String propertyBase, Class<T> classToProvide)
