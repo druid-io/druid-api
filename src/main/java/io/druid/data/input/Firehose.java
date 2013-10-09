@@ -1,7 +1,5 @@
 package io.druid.data.input;
 
-import io.druid.data.input.InputRow;
-
 import java.io.Closeable;
 
 /**
