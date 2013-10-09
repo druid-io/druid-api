@@ -1,22 +1,3 @@
-/*
- * Druid - a distributed column store.
- * Copyright (C) 2012, 2013  Metamarkets Group Inc.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- */
-
 package io.druid.guice;
 
 import com.google.common.base.Supplier;
@@ -28,6 +9,7 @@ import com.google.inject.Provider;
 import com.google.inject.util.Types;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
 import java.util.Properties;
 
 
@@ -129,6 +111,31 @@ public class JsonConfigProvider<T> implements Provider<Supplier<T>>
   {
     binder.bind(supplierKey).toProvider((Provider) of(propertyBase, clazz)).in(LazySingleton.class);
     binder.bind(instanceKey).toProvider(new SupplierProvider<T>(supplierKey));
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> void bindInstance(
+      Binder binder,
+      Key<T> bindKey,
+      T instance
+  )
+  {
+    binder.bind(bindKey).toInstance(instance);
+
+    final ParameterizedType supType = Types.newParameterizedType(Supplier.class, bindKey.getTypeLiteral().getType());
+    final Key supplierKey;
+
+    if (bindKey.getAnnotationType() != null) {
+      supplierKey = Key.get(supType, bindKey.getAnnotationType());
+    }
+    else if (bindKey.getAnnotation() != null) {
+      supplierKey = Key.get(supType, bindKey.getAnnotation());
+    }
+    else {
+      supplierKey = Key.get(supType);
+    }
+
+    binder.bind(supplierKey).toInstance(Suppliers.<T>ofInstance(instance));
   }
 
   public static <T> JsonConfigProvider<T> of(String propertyBase, Class<T> classToProvide)
