@@ -25,7 +25,7 @@ public class TimestampSpec
   )
   {
     this.timestampColumn = timestampColumn.toLowerCase();
-    this.timestampFormat = format == null ? defaultFormat : format;
+    this.timestampFormat = format == null ? defaultFormat : format.toLowerCase();
     this.timestampConverter = ParserUtils.createTimestampParser(timestampFormat);
   }
 
