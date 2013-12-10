@@ -24,7 +24,7 @@ public class TimestampSpec
       @JsonProperty("format") String format
   )
   {
-    this.timestampColumn = timestampColumn.toLowerCase();
+    this.timestampColumn = (timestampColumn == null) ? null : timestampColumn.toLowerCase();
     this.timestampFormat = format == null ? defaultFormat : format.toLowerCase();
     this.timestampConverter = ParserUtils.createTimestampParser(timestampFormat);
   }
