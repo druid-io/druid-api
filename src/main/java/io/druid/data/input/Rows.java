@@ -39,7 +39,7 @@ public class Rows
   {
     final Map<String, Set<String>> dims = Maps.newTreeMap();
     for (final String dim : inputRow.getDimensions()) {
-      final Set<String> dimValues = ImmutableSortedSet.copyOf(inputRow.getDimension(dim));
+      final Set<String> dimValues = ImmutableSortedSet.copyOf(inputRow.getDimension(dim.toLowerCase()));
       if (dimValues.size() > 0) {
         dims.put(dim, dimValues);
       }
