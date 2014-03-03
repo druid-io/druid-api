@@ -2,7 +2,6 @@ package io.druid.data.input.impl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.metamx.common.exception.FormattedException;
@@ -12,44 +11,54 @@ import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class MapInputRowParser implements InputRowParser<Map<String, Object>>
 {
-  private final TimestampSpec timestampSpec;
-  private List<String> dimensions;
-  private final Set<String> dimensionExclusions;
+  private final ParseSpec parseSpec;
 
   @JsonCreator
   public MapInputRowParser(
+      @JsonProperty("parseSpec") ParseSpec parseSpec,
+      // Backwards compatible
       @JsonProperty("timestampSpec") TimestampSpec timestampSpec,
       @JsonProperty("dimensions") List<String> dimensions,
-      @JsonProperty("dimensionExclusions") List<String> dimensionExclusions
+      @JsonProperty("dimensionExclusions") List<String> dimensionExclusions,
+      @JsonProperty("spatialDimensions") List<SpatialDimensionSchema> spatialDimensions
   )
   {
-    this.timestampSpec = timestampSpec;
-    if (dimensions != null) {
-       this.dimensions = ImmutableList.copyOf(dimensions);
-    }
-    this.dimensionExclusions = Sets.newHashSet();
-    if (dimensionExclusions != null) {
-      for (String dimensionExclusion : dimensionExclusions) {
-        this.dimensionExclusions.add(dimensionExclusion.toLowerCase());
+    // Backwards compatible
+    if (parseSpec == null) {
+      if (dimensionExclusions == null) {
+        dimensionExclusions = Lists.newArrayList();
       }
+      if (timestampSpec != null) {
+        dimensionExclusions.add(timestampSpec.getTimestampColumn());
+      }
+      this.parseSpec = new JSONParseSpec(
+          timestampSpec,
+          new DimensionsSpec(dimensions, dimensionExclusions, spatialDimensions)
+      );
+    } else {
+      this.parseSpec = parseSpec;
     }
-    this.dimensionExclusions.add(timestampSpec.getTimestampColumn().toLowerCase());
   }
 
   @Override
   public InputRow parse(Map<String, Object> theMap) throws FormattedException
   {
-    final List<String> dimensions = hasCustomDimensions()
-                                    ? this.dimensions
-                                    : Lists.newArrayList(Sets.difference(theMap.keySet(), dimensionExclusions));
+    final List<String> dimensions = parseSpec.getDimensionsSpec().hasCustomDimensions()
+                                    ? parseSpec.getDimensionsSpec().getDimensions()
+                                    : Lists.newArrayList(
+                                        Sets.difference(
+                                            theMap.keySet(),
+                                            parseSpec.getDimensionsSpec()
+                                                     .getDimensionExclusions()
+                                        )
+                                    );
 
     final DateTime timestamp;
     try {
-      timestamp = timestampSpec.extractTimestamp(theMap);
+      timestamp = parseSpec.getTimestampSpec().extractTimestamp(theMap);
       if (timestamp == null) {
         final String input = theMap.toString();
         throw new NullPointerException(
@@ -70,31 +79,16 @@ public class MapInputRowParser implements InputRowParser<Map<String, Object>>
     return new MapBasedInputRow(timestamp.getMillis(), dimensions, theMap);
   }
 
-  private boolean hasCustomDimensions() {
-    return dimensions != null;
+  @JsonProperty
+  @Override
+  public ParseSpec getParseSpec()
+  {
+    return parseSpec;
   }
 
   @Override
-  public void addDimensionExclusion(String dimension)
+  public InputRowParser withParseSpec(ParseSpec parseSpec)
   {
-    dimensionExclusions.add(dimension);
-  }
-
-  @JsonProperty
-  public TimestampSpec getTimestampSpec()
-  {
-    return timestampSpec;
-  }
-
-  @JsonProperty
-  public List<String> getDimensions()
-  {
-    return dimensions;
-  }
-
-  @JsonProperty
-  public Set<String> getDimensionExclusions()
-  {
-    return dimensionExclusions;
+    return new MapInputRowParser(parseSpec, null, null, null, null);
   }
 }

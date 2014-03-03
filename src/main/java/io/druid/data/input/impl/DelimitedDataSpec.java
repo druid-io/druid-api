@@ -11,6 +11,7 @@ import java.util.List;
 
 /**
  */
+@Deprecated
 public class DelimitedDataSpec implements DataSpec
 {
   private final String delimiter;
@@ -85,5 +86,18 @@ public class DelimitedDataSpec implements DataSpec
     Parser<String, Object> retVal = new DelimitedParser(delimiter);
     retVal.setFieldNames(columns);
     return retVal;
+  }
+
+  @Override
+  public ParseSpec toParseSpec(
+      TimestampSpec timestampSpec, List<String> dimensionExclusions
+  )
+  {
+    return new DelimitedParseSpec(
+        timestampSpec,
+        new DimensionsSpec(dimensions, dimensionExclusions, spatialDimensions),
+        delimiter,
+        columns
+    );
   }
 }

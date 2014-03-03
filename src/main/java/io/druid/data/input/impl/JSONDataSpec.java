@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  */
+@Deprecated
 public class JSONDataSpec implements DataSpec
 {
   private final List<String> dimensions;
@@ -56,5 +57,13 @@ public class JSONDataSpec implements DataSpec
   public Parser<String, Object> getParser()
   {
     return new JSONParser();
+  }
+
+  @Override
+  public ParseSpec toParseSpec(
+      TimestampSpec timestampSpec, List<String> dimensionExclusions
+  )
+  {
+    return new JSONParseSpec(timestampSpec, new DimensionsSpec(dimensions, dimensionExclusions, spatialDimensions));
   }
 }

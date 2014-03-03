@@ -3,7 +3,6 @@ package io.druid.data.input.impl;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableList;
 import com.metamx.common.exception.FormattedException;
 import com.metamx.common.parsers.Parser;
 import com.metamx.common.parsers.ToLowerCaseParser;
@@ -21,100 +20,98 @@ import java.util.Map;
  */
 public class StringInputRowParser implements ByteBufferInputRowParser
 {
-	private final MapInputRowParser inputRowCreator;
-	private final Parser<String, Object> parser;
-  private final DataSpec dataSpec;
+  private final ParseSpec parseSpec;
+  private final MapInputRowParser mapParser;
+  private final Parser<String, Object> parser;
 
-	private CharBuffer chars = null;
+  private CharBuffer chars = null;
 
-	@JsonCreator
-	public StringInputRowParser(
-	    @JsonProperty("timestampSpec") TimestampSpec timestampSpec,
-	    @JsonProperty("data") DataSpec dataSpec,
-	    @JsonProperty("dimensionExclusions") List<String> dimensionExclusions)
-	{
-    this.dataSpec = dataSpec;
-		this.inputRowCreator = new MapInputRowParser(timestampSpec, dataSpec.getDimensions(), dimensionExclusions);
-		this.parser = new ToLowerCaseParser(dataSpec.getParser());
-	}
-
-	public void addDimensionExclusion(String dimension)
-	{
-		inputRowCreator.addDimensionExclusion(dimension);
-	}
-
-	@Override
-	public InputRow parse(ByteBuffer input) throws FormattedException
-	{
-		return parseMap(buildStringKeyMap(input));
-	}
-
-	private Map<String, Object> buildStringKeyMap(ByteBuffer input)
-	{
-		int payloadSize = input.remaining();
-
-		if (chars == null || chars.remaining() < payloadSize)
-		{
-			chars = CharBuffer.allocate(payloadSize);
-		}
-
-		final CoderResult coderResult = Charsets.UTF_8.newDecoder()
-		    .onMalformedInput(CodingErrorAction.REPLACE)
-		    .onUnmappableCharacter(CodingErrorAction.REPLACE)
-		    .decode(input, chars, true);
-
-		Map<String, Object> theMap;
-		if (coderResult.isUnderflow())
-		{
-			chars.flip();
-			try
-			{
-				theMap = parseString(chars.toString());
-			} finally
-			{
-				chars.clear();
-			}
-		}
-		else
-		{
-			throw new FormattedException.Builder()
-			    .withErrorCode(FormattedException.ErrorCode.UNPARSABLE_ROW)
-			    .withMessage(String.format("Failed with CoderResult[%s]", coderResult))
-			    .build();
-		}
-		return theMap;
-	}
-
-	private Map<String, Object> parseString(String inputString)
-	{
-		return parser.parse(inputString);
-	}
-
-	public InputRow parse(String input) throws FormattedException
-	{
-		return parseMap(parseString(input));
-	}
-
-	private InputRow parseMap(Map<String, Object> theMap)
-	{
-		return inputRowCreator.parse(theMap);
-	}
-
-  @JsonProperty
-  public TimestampSpec getTimestampSpec()
+  @JsonCreator
+  public StringInputRowParser(
+      @JsonProperty("parseSpec") ParseSpec parseSpec,
+      // Backwards compatible
+      @JsonProperty("timestampSpec") TimestampSpec timestampSpec,
+      @JsonProperty("data") final DataSpec dataSpec,
+      @JsonProperty("dimensionExclusions") List<String> dimensionExclusions
+  )
   {
-    return inputRowCreator.getTimestampSpec();
+    if (parseSpec == null) {
+      this.parseSpec = dataSpec == null ? null : dataSpec.toParseSpec(timestampSpec, dimensionExclusions);
+      this.mapParser = new MapInputRowParser(this.parseSpec, null, null, null, null);
+      if (this.parseSpec != null) {
+        this.parser = new ToLowerCaseParser(this.parseSpec.makeParser());
+      } else {
+        this.parser = null;
+      }
+    } else {
+      this.parseSpec = parseSpec;
+      this.mapParser = new MapInputRowParser(parseSpec, null, null, null, null);
+      this.parser = new ToLowerCaseParser(parseSpec.makeParser());
+    }
   }
 
-  @JsonProperty("data")
-  public DataSpec getDataSpec()
+  @Override
+  public InputRow parse(ByteBuffer input) throws FormattedException
   {
-    return dataSpec;
+    return parseMap(buildStringKeyMap(input));
   }
 
   @JsonProperty
-  public List<String> getDimensionExclusions()
+  @Override
+  public ParseSpec getParseSpec()
   {
-    return ImmutableList.copyOf(inputRowCreator.getDimensionExclusions());
+    return parseSpec;
+  }
+
+  @Override
+  public StringInputRowParser withParseSpec(ParseSpec parseSpec)
+  {
+    return new StringInputRowParser(parseSpec, null, null, null);
+  }
+
+  private Map<String, Object> buildStringKeyMap(ByteBuffer input)
+  {
+    int payloadSize = input.remaining();
+
+    if (chars == null || chars.remaining() < payloadSize) {
+      chars = CharBuffer.allocate(payloadSize);
+    }
+
+    final CoderResult coderResult = Charsets.UTF_8.newDecoder()
+                                            .onMalformedInput(CodingErrorAction.REPLACE)
+                                            .onUnmappableCharacter(CodingErrorAction.REPLACE)
+                                            .decode(input, chars, true);
+
+    Map<String, Object> theMap;
+    if (coderResult.isUnderflow()) {
+      chars.flip();
+      try {
+        theMap = parseString(chars.toString());
+      }
+      finally {
+        chars.clear();
+      }
+    } else {
+      throw new FormattedException.Builder()
+          .withErrorCode(FormattedException.ErrorCode.UNPARSABLE_ROW)
+          .withMessage(String.format("Failed with CoderResult[%s]", coderResult))
+          .build();
+    }
+    return theMap;
+  }
+
+  private Map<String, Object> parseString(String inputString)
+  {
+    return parser.parse(inputString);
+  }
+
+  public InputRow parse(String input) throws FormattedException
+  {
+    return parseMap(parseString(input));
+  }
+
+  private InputRow parseMap(Map<String, Object> theMap)
+  {
+    return mapParser.parse(theMap);
   }
 }

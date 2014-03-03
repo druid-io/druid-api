@@ -21,11 +21,11 @@ public class InputRowParserSerdeTest
   public void testStringInputRowParserSerde() throws Exception
   {
     final StringInputRowParser parser = new StringInputRowParser(
-        new TimestampSpec("timestamp", "iso"),
-        new JSONDataSpec(
-            ImmutableList.of("foo", "bar"), ImmutableList.<SpatialDimensionSchema>of()
+        new JSONParseSpec(
+            new TimestampSpec("timestamp", "iso"),
+            new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null)
         ),
-        ImmutableList.of("baz")
+        null, null, null
     );
     final ByteBufferInputRowParser parser2 = jsonMapper.readValue(
         jsonMapper.writeValueAsBytes(parser),
@@ -46,9 +46,11 @@ public class InputRowParserSerdeTest
   public void testMapInputRowParserSerde() throws Exception
   {
     final MapInputRowParser parser = new MapInputRowParser(
-        new TimestampSpec("timestamp", "iso"),
-        ImmutableList.of("foo", "bar"),
-        ImmutableList.of("baz")
+        new JSONParseSpec(
+            new TimestampSpec("timestamp", "iso"),
+            new DimensionsSpec(ImmutableList.of("foo", "bar"), ImmutableList.of("baz"), null)
+        ),
+        null, null, null, null
     );
     final MapInputRowParser parser2 = jsonMapper.readValue(
         jsonMapper.writeValueAsBytes(parser),
