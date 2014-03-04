@@ -24,7 +24,7 @@ public class DimensionsSpec
       @JsonProperty("spatialDimensions") List<SpatialDimensionSchema> spatialDimensions
   )
   {
-    this.dimensions = dimensions;
+    this.dimensions = dimensions == null ? Lists.<String>newArrayList() : dimensions;
     this.dimensionExclusions = (dimensionExclusions == null)
                                ? Sets.<String>newHashSet()
                                : Sets.newHashSet(dimensionExclusions);

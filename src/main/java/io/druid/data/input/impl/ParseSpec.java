@@ -1,5 +1,6 @@
 package io.druid.data.input.impl;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.metamx.common.parsers.Parser;
@@ -14,17 +15,46 @@ import java.util.List;
     @JsonSubTypes.Type(name = "csv", value = CSVParseSpec.class),
     @JsonSubTypes.Type(name = "tsv", value = DelimitedParseSpec.class)
 })
-public interface ParseSpec
+public abstract class ParseSpec
 {
-  public TimestampSpec getTimestampSpec();
+  private final TimestampSpec timestampSpec;
+  private final DimensionsSpec dimensionsSpec;
 
-  public DimensionsSpec getDimensionsSpec();
+  protected ParseSpec(TimestampSpec timestampSpec, DimensionsSpec dimensionsSpec)
+  {
+    this.timestampSpec = timestampSpec;
+    this.dimensionsSpec = dimensionsSpec;
+  }
 
-  public void verify(List<String> usedCols);
+  @JsonProperty
+  public TimestampSpec getTimestampSpec()
+  {
+    return timestampSpec;
+  }
 
-  public Parser<String, Object> makeParser();
+  @JsonProperty
+  public DimensionsSpec getDimensionsSpec()
+  {
+    return dimensionsSpec;
+  }
 
-  public ParseSpec withTimestampSpec(TimestampSpec spec);
+  public void verify(List<String> usedCols)
+  {
+    // do nothing
+  }
 
-  public ParseSpec withDimensionsSpec(DimensionsSpec spec);
+  public Parser<String, Object> makeParser()
+  {
+    return null;
+  }
+
+  public ParseSpec withTimestampSpec(TimestampSpec spec)
+  {
+    throw new UnsupportedOperationException();
+  }
+
+  public ParseSpec withDimensionsSpec(DimensionsSpec spec)
+  {
+    throw new UnsupportedOperationException();
+  }
 }

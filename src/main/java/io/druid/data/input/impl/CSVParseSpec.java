@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  */
-public class CSVParseSpec extends AbstractParseSpec
+public class CSVParseSpec extends ParseSpec
 {
   private final List<String> columns;
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  */
-public class JSONParseSpec extends AbstractParseSpec
+public class JSONParseSpec extends ParseSpec
 {
   @JsonCreator
   public JSONParseSpec(

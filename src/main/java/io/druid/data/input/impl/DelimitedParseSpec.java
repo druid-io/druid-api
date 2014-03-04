@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  */
-public class DelimitedParseSpec extends AbstractParseSpec
+public class DelimitedParseSpec extends ParseSpec
 {
   private final String delimiter;
   private final List<String> columns;
