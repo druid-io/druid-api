@@ -61,9 +61,9 @@ public class JsonConfigurator
         final String propValue = props.getProperty(prop);
         Object value;
         try {
-          // If it's a String Jackson wants it to be quoted, so check if it's not an object or array and quote.
+          // If it's a String Jackson wants it to be quoted, so check if it's not an object or array or quote.
           String modifiedPropValue = propValue;
-          if (! (modifiedPropValue.startsWith("[") || modifiedPropValue.startsWith("{"))) {
+          if (! (modifiedPropValue.startsWith("[") || modifiedPropValue.startsWith("{") || modifiedPropValue.startsWith("\""))) {
             modifiedPropValue = String.format("\"%s\"", modifiedPropValue);
           }
           value = jsonMapper.readValue(modifiedPropValue, Object.class);
