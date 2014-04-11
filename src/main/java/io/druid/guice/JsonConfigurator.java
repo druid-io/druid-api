@@ -1,13 +1,10 @@
 package io.druid.guice;
 
-import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 import com.google.common.base.Function;
-import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -18,12 +15,8 @@ import com.metamx.common.logger.Logger;
 
 import javax.annotation.Nullable;
 import javax.validation.ConstraintViolation;
-import javax.validation.ElementKind;
-import javax.validation.Path;
 import javax.validation.Validator;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -34,7 +27,6 @@ import java.util.Set;
 public class JsonConfigurator
 {
   private static final Logger log = new Logger(JsonConfigurator.class);
-
   private final ObjectMapper jsonMapper;
   private final Validator validator;
 
@@ -63,7 +55,9 @@ public class JsonConfigurator
         try {
           // If it's a String Jackson wants it to be quoted, so check if it's not an object or array or quote.
           String modifiedPropValue = propValue;
-          if (! (modifiedPropValue.startsWith("[") || modifiedPropValue.startsWith("{") || modifiedPropValue.startsWith("\""))) {
+          if (!(modifiedPropValue.startsWith("[") || modifiedPropValue.startsWith("{") || modifiedPropValue.startsWith(
+              "\""
+          ))) {
             modifiedPropValue = String.format("\"%s\"", modifiedPropValue);
           }
           value = jsonMapper.readValue(modifiedPropValue, Object.class);
@@ -93,35 +87,35 @@ public class JsonConfigurator
 
       for (ConstraintViolation<T> violation : violations) {
         String path = "";
-        try {
-          Class<?> beanClazz = violation.getRootBeanClass();
-          final Iterator<Path.Node> iter = violation.getPropertyPath().iterator();
-          while (iter.hasNext()) {
-            Path.Node next = iter.next();
-            if (next.getKind() == ElementKind.PROPERTY) {
-              final String fieldName = next.getName();
-              final Field theField = beanClazz.getDeclaredField(fieldName);
-
-              if (theField.getAnnotation(JacksonInject.class) != null) {
-                path = String.format(" -- Injected field[%s] not bound!?", fieldName);
-                break;
-              }
-
-              JsonProperty annotation = theField.getAnnotation(JsonProperty.class);
-              final boolean noAnnotationValue = annotation == null || Strings.isNullOrEmpty(annotation.value());
-              final String pathPart = noAnnotationValue ? fieldName : annotation.value();
-              if (path.isEmpty()) {
-                path += pathPart;
-              }
-              else {
-                path += "." + pathPart;
-              }
-            }
-          }
-        }
-        catch (NoSuchFieldException e) {
-          throw Throwables.propagate(e);
-        }
+//        try {
+//          Class<?> beanClazz = violation.getRootBeanClass();
+//          final Iterator<Path.Node> iter = violation.getPropertyPath().iterator();
+//          while (iter.hasNext()) {
+//            Path.Node next = iter.next();
+//            if (next.getKind() == ElementKind.PROPERTY) {
+//              final String fieldName = next.getName();
+//              final Field theField = beanClazz.getDeclaredField(fieldName);
+//
+//              if (theField.getAnnotation(JacksonInject.class) != null) {
+//                path = String.format(" -- Injected field[%s] not bound!?", fieldName);
+//                break;
+//              }
+//
+//              JsonProperty annotation = theField.getAnnotation(JsonProperty.class);
+//              final boolean noAnnotationValue = annotation == null || Strings.isNullOrEmpty(annotation.value());
+//              final String pathPart = noAnnotationValue ? fieldName : annotation.value();
+//              if (path.isEmpty()) {
+//                path += pathPart;
+//              }
+//              else {
+//                path += "." + pathPart;
+//              }
+//            }
+//          }
+//      }
+//        catch (NoSuchFieldException e) {
+//          throw Throwables.propagate(e);
+//        }
 
         messages.add(String.format("%s - %s", path, violation.getMessage()));
       }
@@ -150,8 +144,8 @@ public class JsonConfigurator
   private <T> void verifyClazzIsConfigurable(Class<T> clazz)
   {
     final List<BeanPropertyDefinition> beanDefs = jsonMapper.getSerializationConfig()
-                                                              .introspect(jsonMapper.constructType(clazz))
-                                                              .findProperties();
+                                                            .introspect(jsonMapper.constructType(clazz))
+                                                            .findProperties();
     for (BeanPropertyDefinition beanDef : beanDefs) {
       final AnnotatedField field = beanDef.getField();
       if (field == null || !field.hasAnnotation(JsonProperty.class)) {
