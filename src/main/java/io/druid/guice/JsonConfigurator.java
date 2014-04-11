@@ -8,7 +8,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.ProvisionException;
 import com.google.inject.spi.Message;
@@ -74,11 +73,7 @@ public class JsonConfigurator
 
     final T config;
     try {
-      if (!jsonMap.isEmpty()) {
-        config = jsonMapper.convertValue(jsonMap, clazz);
-      } else {
-        config = null;
-      }
+      config = jsonMapper.convertValue(jsonMap, clazz);
     }
     catch (IllegalArgumentException e) {
       throw new ProvisionException(
@@ -86,12 +81,7 @@ public class JsonConfigurator
       );
     }
 
-    final Set<ConstraintViolation<T>> violations;
-    if (config != null) {
-      violations = validator.validate(config);
-    } else {
-      violations = Sets.newHashSet();
-    }
+    final Set<ConstraintViolation<T>> violations = validator.validate(config);
     if (!violations.isEmpty()) {
       List<String> messages = Lists.newArrayList();
 
