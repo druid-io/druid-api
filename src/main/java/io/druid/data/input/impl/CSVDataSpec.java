@@ -11,6 +11,7 @@ import java.util.List;
 
 /**
  */
+@Deprecated
 public class CSVDataSpec implements DataSpec
 {
   private final List<String> columns;
@@ -74,5 +75,17 @@ public class CSVDataSpec implements DataSpec
   public Parser<String, Object> getParser()
   {
     return new CSVParser(columns);
+  }
+
+  @Override
+  public ParseSpec toParseSpec(
+      TimestampSpec timestampSpec, List<String> dimensionExclusions
+  )
+  {
+    return new CSVParseSpec(
+        timestampSpec,
+        new DimensionsSpec(dimensions, dimensionExclusions, spatialDimensions),
+        columns
+    );
   }
 }

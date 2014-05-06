@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  */
+@Deprecated
 public class ToLowercaseDataSpec implements DataSpec
 {
   private final DataSpec delegate;
@@ -53,5 +54,13 @@ public class ToLowercaseDataSpec implements DataSpec
   public DataSpec getDelegate()
   {
     return delegate;
+  }
+
+  @Override
+  public ParseSpec toParseSpec(
+      TimestampSpec timestampSpec, List<String> dimensionExclusions
+  )
+  {
+    return delegate.toParseSpec(timestampSpec, dimensionExclusions);
   }
 }
