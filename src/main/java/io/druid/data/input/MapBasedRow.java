@@ -21,15 +21,6 @@ public class MapBasedRow implements Row
   private final DateTime timestamp;
   private final Map<String, Object> event;
 
-  private static final Function<Object, String> TO_STRING = new Function<Object, String>()
-  {
-    @Override
-    public String apply(@Nullable Object input)
-    {
-      return input == null ? null : String.valueOf(input);
-    }
-  };
-
   @JsonCreator
   public MapBasedRow(
       @JsonProperty("timestamp") DateTime timestamp,
@@ -56,12 +47,24 @@ public class MapBasedRow implements Row
   @Override
   public List<String> getDimension(String dimension)
   {
-    final Object dimValue = event.get(dimension);
+    Object dimValue = event.get(dimension);
 
-    if (dimValue instanceof List) {
-      return Lists.transform((List) dimValue, TO_STRING);
-    } else if (dimValue == null || dimValue instanceof Object) {
-      return Arrays.asList(TO_STRING.apply(event.get(dimension)));
+    if (dimValue == null) {
+      return Lists.newArrayList();
+    } else if (dimValue instanceof List) {
+      return Lists.transform(
+          (List) dimValue,
+          new Function<Object, String>()
+          {
+            @Override
+            public String apply(@Nullable Object input)
+            {
+              return String.valueOf(input);
+            }
+          }
+      );
+    } else if (dimValue instanceof Object) {
+      return Arrays.asList(String.valueOf(event.get(dimension)));
     } else {
       throw new IAE("Unknown dim type[%s]", dimValue.getClass());
     }
