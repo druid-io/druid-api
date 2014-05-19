@@ -3,7 +3,6 @@ package io.druid.data.input.impl;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import com.metamx.common.parsers.ParserUtils;
 import org.joda.time.DateTime;
 
@@ -13,6 +12,7 @@ import java.util.Map;
  */
 public class TimestampSpec
 {
+  private static final String defaultColumn = "timestamp";
   private static final String defaultFormat = "auto";
 
   private final String timestampColumn;
@@ -25,7 +25,7 @@ public class TimestampSpec
       @JsonProperty("format") String format
   )
   {
-    this.timestampColumn = (timestampColumn == null) ? null : timestampColumn.toLowerCase();
+    this.timestampColumn = (timestampColumn == null) ? defaultColumn : timestampColumn.toLowerCase();
     this.timestampFormat = format == null ? defaultFormat : format;
     this.timestampConverter = ParserUtils.createTimestampParser(timestampFormat);
   }
