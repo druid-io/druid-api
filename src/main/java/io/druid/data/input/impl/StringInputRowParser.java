@@ -3,6 +3,7 @@ package io.druid.data.input.impl;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
 import com.metamx.common.exception.FormattedException;
 import com.metamx.common.parsers.Parser;
 import com.metamx.common.parsers.ToLowerCaseParser;
@@ -32,17 +33,25 @@ public class StringInputRowParser implements ByteBufferInputRowParser
       // Backwards compatible
       @JsonProperty("timestampSpec") TimestampSpec timestampSpec,
       @JsonProperty("data") final DataSpec dataSpec,
+      @JsonProperty("dimensions") List<String> dimensions,
       @JsonProperty("dimensionExclusions") List<String> dimensionExclusions
   )
   {
     if (parseSpec == null) {
-      this.parseSpec = dataSpec == null ? null : dataSpec.toParseSpec(timestampSpec, dimensionExclusions);
-      this.mapParser = new MapInputRowParser(this.parseSpec, null, null, null, null);
-      if (this.parseSpec != null) {
-        this.parser = new ToLowerCaseParser(this.parseSpec.makeParser());
+      if (dataSpec == null) {
+        this.parseSpec = new JSONParseSpec(
+            timestampSpec,
+            new DimensionsSpec(
+                dimensions,
+                dimensionExclusions,
+                ImmutableList.<SpatialDimensionSchema>of()
+            )
+        );
       } else {
-        this.parser = null;
+        this.parseSpec = dataSpec.toParseSpec(timestampSpec, dimensionExclusions);
       }
+      this.mapParser = new MapInputRowParser(this.parseSpec, null, null, null, null);
+      this.parser = new ToLowerCaseParser(this.parseSpec.makeParser());
     } else {
       this.parseSpec = parseSpec;
       this.mapParser = new MapInputRowParser(parseSpec, null, null, null, null);
@@ -66,7 +75,7 @@ public class StringInputRowParser implements ByteBufferInputRowParser
   @Override
   public StringInputRowParser withParseSpec(ParseSpec parseSpec)
   {
-    return new StringInputRowParser(parseSpec, null, null, null);
+    return new StringInputRowParser(parseSpec, null, null, null, null);
   }
 
   private Map<String, Object> buildStringKeyMap(ByteBuffer input)
