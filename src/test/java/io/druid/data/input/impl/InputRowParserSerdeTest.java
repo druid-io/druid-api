@@ -25,7 +25,7 @@ public class InputRowParserSerdeTest
             new TimestampSpec("timestamp", "iso"),
             new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null)
         ),
-        null, null, null
+        null, null, null, null
     );
     final ByteBufferInputRowParser parser2 = jsonMapper.readValue(
         jsonMapper.writeValueAsBytes(parser),
@@ -47,7 +47,7 @@ public class InputRowParserSerdeTest
   {
     final MapInputRowParser parser = new MapInputRowParser(
         new JSONParseSpec(
-            new TimestampSpec("timestamp", "iso"),
+            new TimestampSpec("timeposix", "posix"),
             new DimensionsSpec(ImmutableList.of("foo", "bar"), ImmutableList.of("baz"), null)
         ),
         null, null, null, null
@@ -61,12 +61,29 @@ public class InputRowParserSerdeTest
             "foo", "x",
             "bar", "y",
             "qux", "z",
-            "timestamp", "2000"
+            "timeposix", "1"
         )
     );
     Assert.assertEquals(ImmutableList.of("foo", "bar"), parsed.getDimensions());
     Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension("foo"));
     Assert.assertEquals(ImmutableList.of("y"), parsed.getDimension("bar"));
-    Assert.assertEquals(new DateTime("2000").getMillis(), parsed.getTimestampFromEpoch());
+    Assert.assertEquals(1000, parsed.getTimestampFromEpoch());
+  }
+
+  @Test
+  public void testMapInputRowParserSerdeBackwardsCompatibility() throws Exception
+  {
+    final String json = "{\"timestampSpec\":{\"column\":\"time\",\"format\":\"posix\"},\"dimensions\":[\"dim1\"],\"dimensionExclusions\":[\"time\"]}}";
+    final InputRowParser parser = jsonMapper.readValue(json, InputRowParser.class);
+    final MapInputRowParser mapInputRowParser = new MapInputRowParser(parser.getParseSpec(), null, null, null, null);
+    final InputRow parsed = mapInputRowParser.parse(
+        ImmutableMap.<String, Object>of(
+            "dim1", "x",
+            "time", "1"
+        )
+    );
+    Assert.assertEquals(ImmutableList.of("dim1"), parsed.getDimensions());
+    Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension("dim1"));
+    Assert.assertEquals(1000, parsed.getTimestampFromEpoch());
   }
 }
