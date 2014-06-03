@@ -3,7 +3,8 @@ package io.druid.data.input.impl;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Charsets;
-import com.metamx.common.exception.FormattedException;
+import com.metamx.common.IAE;
+import com.metamx.common.logger.Logger;
 import com.metamx.common.parsers.Parser;
 import com.metamx.common.parsers.ToLowerCaseParser;
 import io.druid.data.input.ByteBufferInputRowParser;
@@ -20,6 +21,8 @@ import java.util.Map;
  */
 public class StringInputRowParser implements ByteBufferInputRowParser
 {
+  private static final Logger log = new Logger(StringInputRowParser.class);
+
   private final ParseSpec parseSpec;
   private final MapInputRowParser mapParser;
   private final Parser<String, Object> parser;
@@ -51,7 +54,7 @@ public class StringInputRowParser implements ByteBufferInputRowParser
   }
 
   @Override
-  public InputRow parse(ByteBuffer input) throws FormattedException
+  public InputRow parse(ByteBuffer input)
   {
     return parseMap(buildStringKeyMap(input));
   }
@@ -78,9 +81,9 @@ public class StringInputRowParser implements ByteBufferInputRowParser
     }
 
     final CoderResult coderResult = Charsets.UTF_8.newDecoder()
-                                            .onMalformedInput(CodingErrorAction.REPLACE)
-                                            .onUnmappableCharacter(CodingErrorAction.REPLACE)
-                                            .decode(input, chars, true);
+                                                  .onMalformedInput(CodingErrorAction.REPLACE)
+                                                  .onUnmappableCharacter(CodingErrorAction.REPLACE)
+                                                  .decode(input, chars, true);
 
     Map<String, Object> theMap;
     if (coderResult.isUnderflow()) {
@@ -92,10 +95,7 @@ public class StringInputRowParser implements ByteBufferInputRowParser
         chars.clear();
       }
     } else {
-      throw new FormattedException.Builder()
-          .withErrorCode(FormattedException.ErrorCode.UNPARSABLE_ROW)
-          .withMessage(String.format("Failed with CoderResult[%s]", coderResult))
-          .build();
+      throw new IAE("Failed with CoderResult[%s]", coderResult);
     }
     return theMap;
   }
@@ -105,7 +105,7 @@ public class StringInputRowParser implements ByteBufferInputRowParser
     return parser.parse(inputString);
   }
 
-  public InputRow parse(String input) throws FormattedException
+  public InputRow parse(String input)
   {
     return parseMap(parseString(input));
   }

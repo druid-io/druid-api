@@ -11,7 +11,6 @@ import com.google.inject.binder.ScopedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.util.Types;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.ParameterizedType;
 import java.util.Map;
 import java.util.Properties;
@@ -40,7 +39,7 @@ public class PolyBind
       Binder binder,
       String property,
       Key<T> interfaceKey,
-      @Nullable Key<? extends T> defaultKey
+      Key<? extends T> defaultKey
   )
   {
     return binder.bind(interfaceKey).toProvider(new ConfiggedProvider<T>(interfaceKey, property, defaultKey));

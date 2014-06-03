@@ -3,13 +3,12 @@ package io.druid.data.input;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.metamx.common.IAE;
-import com.metamx.common.exception.FormattedException;
+import com.metamx.common.logger.Logger;
 import org.joda.time.DateTime;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -18,13 +17,15 @@ import java.util.Map;
  */
 public class MapBasedRow implements Row
 {
+  private static final Logger log = new Logger(MapBasedRow.class);
+
   private final DateTime timestamp;
   private final Map<String, Object> event;
 
   @JsonCreator
   public MapBasedRow(
       @JsonProperty("timestamp") DateTime timestamp,
-      @JsonProperty("event")  Map<String, Object> event
+      @JsonProperty("event") Map<String, Object> event
   )
   {
     this.timestamp = timestamp;
@@ -34,7 +35,8 @@ public class MapBasedRow implements Row
   public MapBasedRow(
       long timestamp,
       Map<String, Object> event
-  ) {
+  )
+  {
     this(new DateTime(timestamp), event);
   }
 
@@ -57,7 +59,7 @@ public class MapBasedRow implements Row
           new Function<Object, String>()
           {
             @Override
-            public String apply(@Nullable Object input)
+            public String apply(Object input)
             {
               return String.valueOf(input);
             }
@@ -71,7 +73,8 @@ public class MapBasedRow implements Row
   }
 
   @Override
-  public Object getRaw(String dimension) {
+  public Object getRaw(String dimension)
+  {
     return event.get(dimension);
   }
 
@@ -91,11 +94,8 @@ public class MapBasedRow implements Row
         return Float.valueOf(((String) metricValue).replace(",", ""));
       }
       catch (Exception e) {
-        throw new FormattedException.Builder()
-            .withErrorCode(FormattedException.ErrorCode.UNPARSABLE_METRIC)
-            .withDetails(ImmutableMap.<String, Object>of("metricName", metric, "metricValue", metricValue))
-            .withMessage(e.getMessage())
-            .build();
+        log.error("Unable to parse metrics[%s], value[%s]", metric, metricValue);
+        throw Throwables.propagate(e);
       }
     } else {
       throw new IAE("Unknown type[%s]", metricValue.getClass());

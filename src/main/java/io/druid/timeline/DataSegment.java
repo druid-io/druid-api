@@ -18,7 +18,6 @@ import io.druid.timeline.partition.ShardSpec;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
-import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +77,7 @@ public class DataSegment implements Comparable<DataSegment>
     final Predicate<String> nonEmpty = new Predicate<String>()
     {
       @Override
-      public boolean apply(@Nullable String input)
+      public boolean apply(String input)
       {
         return input != null && !input.isEmpty();
       }
