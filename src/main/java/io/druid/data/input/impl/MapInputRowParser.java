@@ -33,6 +33,9 @@ public class MapInputRowParser implements InputRowParser<Map<String, Object>>
       }
       if (timestampSpec != null) {
         dimensionExclusions.add(timestampSpec.getTimestampColumn());
+      } else {
+        // Default timeStampSpec for backwards compatibility
+        timestampSpec = new TimestampSpec(null, null);
       }
       this.parseSpec = new JSONParseSpec(
           timestampSpec,
