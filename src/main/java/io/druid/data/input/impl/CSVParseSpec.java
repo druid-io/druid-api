@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.metamx.common.parsers.CSVParser;
+import com.metamx.common.parsers.ParseException;
 import com.metamx.common.parsers.Parser;
 
 import java.util.List;
@@ -56,7 +57,7 @@ public class CSVParseSpec extends ParseSpec
   }
 
   @Override
-  public Parser<String, Object> makeParser()
+  public Parser<String, Object> makeParser() throws ParseException
   {
     return new CSVParser(Optional.fromNullable(listDelimiter), columns);
   }

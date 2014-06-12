@@ -47,7 +47,7 @@ public class MapInputRowParser implements InputRowParser<Map<String, Object>>
   }
 
   @Override
-  public InputRow parse(Map<String, Object> theMap)
+  public InputRow parse(Map<String, Object> theMap) throws ParseException
   {
     final List<String> dimensions = parseSpec.getDimensionsSpec().hasCustomDimensions()
                                     ? parseSpec.getDimensionsSpec().getDimensions()

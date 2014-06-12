@@ -3,6 +3,8 @@ package io.druid.data.input.impl;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Function;
+import com.google.common.base.Throwables;
+import com.metamx.common.parsers.ParseException;
 import com.metamx.common.parsers.ParserUtils;
 import org.joda.time.DateTime;
 
@@ -27,7 +29,12 @@ public class TimestampSpec
   {
     this.timestampColumn = (timestampColumn == null) ? defaultColumn : timestampColumn.toLowerCase();
     this.timestampFormat = format == null ? defaultFormat : format;
-    this.timestampConverter = ParserUtils.createTimestampParser(timestampFormat);
+    try {
+      this.timestampConverter = ParserUtils.createTimestampParser(timestampFormat);
+    }
+    catch (ParseException e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @JsonProperty("column")

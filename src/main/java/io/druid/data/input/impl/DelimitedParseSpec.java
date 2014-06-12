@@ -6,6 +6,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.metamx.common.parsers.DelimitedParser;
+import com.metamx.common.parsers.ParseException;
 import com.metamx.common.parsers.Parser;
 
 import java.util.List;
@@ -59,7 +60,7 @@ public class DelimitedParseSpec extends ParseSpec
   }
 
   @Override
-  public Parser<String, Object> makeParser()
+  public Parser<String, Object> makeParser() throws ParseException
   {
     Parser<String, Object> retVal = new DelimitedParser(
         Optional.fromNullable(delimiter),

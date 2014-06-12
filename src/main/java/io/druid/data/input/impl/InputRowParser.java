@@ -2,6 +2,7 @@ package io.druid.data.input.impl;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.metamx.common.parsers.ParseException;
 import io.druid.data.input.InputRow;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = StringInputRowParser.class)
@@ -11,9 +12,9 @@ import io.druid.data.input.InputRow;
 })
 public interface InputRowParser<T>
 {
-  public InputRow parse(T input);
+  public InputRow parse(T input) throws ParseException;
 
   public ParseSpec getParseSpec();
 
-  public InputRowParser withParseSpec(ParseSpec parseSpec);
+  public InputRowParser withParseSpec(ParseSpec parseSpec) throws ParseException;
 }

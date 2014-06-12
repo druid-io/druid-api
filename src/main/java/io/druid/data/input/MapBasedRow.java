@@ -79,7 +79,7 @@ public class MapBasedRow implements Row
   }
 
   @Override
-  public float getFloatMetric(String metric)
+  public float getFloatMetric(String metric) throws ParseException
   {
     Object metricValue = event.get(metric);
 

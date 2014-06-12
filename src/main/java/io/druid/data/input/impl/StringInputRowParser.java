@@ -6,6 +6,7 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.metamx.common.IAE;
 import com.metamx.common.logger.Logger;
+import com.metamx.common.parsers.ParseException;
 import com.metamx.common.parsers.Parser;
 import com.metamx.common.parsers.ToLowerCaseParser;
 import io.druid.data.input.ByteBufferInputRowParser;
@@ -38,7 +39,7 @@ public class StringInputRowParser implements ByteBufferInputRowParser
       @JsonProperty("data") final DataSpec dataSpec,
       @JsonProperty("dimensions") List<String> dimensions,
       @JsonProperty("dimensionExclusions") List<String> dimensionExclusions
-  )
+  ) throws ParseException
   {
     if (parseSpec == null) {
       if (dataSpec == null) {
@@ -63,7 +64,7 @@ public class StringInputRowParser implements ByteBufferInputRowParser
   }
 
   @Override
-  public InputRow parse(ByteBuffer input)
+  public InputRow parse(ByteBuffer input) throws ParseException
   {
     return parseMap(buildStringKeyMap(input));
   }
@@ -76,12 +77,12 @@ public class StringInputRowParser implements ByteBufferInputRowParser
   }
 
   @Override
-  public StringInputRowParser withParseSpec(ParseSpec parseSpec)
+  public StringInputRowParser withParseSpec(ParseSpec parseSpec) throws ParseException
   {
     return new StringInputRowParser(parseSpec, null, null, null, null);
   }
 
-  private Map<String, Object> buildStringKeyMap(ByteBuffer input)
+  private Map<String, Object> buildStringKeyMap(ByteBuffer input) throws ParseException
   {
     int payloadSize = input.remaining();
 
@@ -109,17 +110,17 @@ public class StringInputRowParser implements ByteBufferInputRowParser
     return theMap;
   }
 
-  private Map<String, Object> parseString(String inputString)
+  private Map<String, Object> parseString(String inputString) throws ParseException
   {
     return parser.parse(inputString);
   }
 
-  public InputRow parse(String input)
+  public InputRow parse(String input) throws ParseException
   {
     return parseMap(parseString(input));
   }
 
-  private InputRow parseMap(Map<String, Object> theMap)
+  private InputRow parseMap(Map<String, Object> theMap) throws ParseException
   {
     return mapParser.parse(theMap);
   }

@@ -6,6 +6,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.metamx.common.parsers.CSVParser;
+import com.metamx.common.parsers.ParseException;
 import com.metamx.common.parsers.Parser;
 
 import java.util.List;
@@ -83,7 +84,7 @@ public class CSVDataSpec implements DataSpec
   }
 
   @Override
-  public Parser<String, Object> getParser()
+  public Parser<String, Object> getParser() throws ParseException
   {
     return new CSVParser(Optional.fromNullable(listDelimiter), columns);
   }

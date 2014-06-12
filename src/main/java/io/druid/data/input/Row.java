@@ -2,6 +2,7 @@ package io.druid.data.input;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.metamx.common.parsers.ParseException;
 
 import java.util.List;
 
@@ -57,5 +58,5 @@ public interface Row
    * @param metric the lowercase column name of the metric requested
    * @return the float value for the provided column name.
    */
-  public float getFloatMetric(String metric);
+  public float getFloatMetric(String metric) throws ParseException;
 }
