@@ -3,10 +3,10 @@ package io.druid.data.input;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Function;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.metamx.common.IAE;
 import com.metamx.common.logger.Logger;
+import com.metamx.common.parsers.ParseException;
 import org.joda.time.DateTime;
 
 import java.util.Arrays;
@@ -94,11 +94,10 @@ public class MapBasedRow implements Row
         return Float.valueOf(((String) metricValue).replace(",", ""));
       }
       catch (Exception e) {
-        log.error("Unable to parse metrics[%s], value[%s]", metric, metricValue);
-        throw Throwables.propagate(e);
+        throw new ParseException(e, "Unable to parse metrics[%s], value[%s]", metric, metricValue);
       }
     } else {
-      throw new IAE("Unknown type[%s]", metricValue.getClass());
+      throw new ParseException("Unknown type[%s]", metricValue.getClass());
     }
   }
 

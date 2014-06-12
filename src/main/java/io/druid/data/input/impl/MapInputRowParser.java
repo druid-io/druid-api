@@ -2,10 +2,10 @@ package io.druid.data.input.impl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.metamx.common.logger.Logger;
+import com.metamx.common.parsers.ParseException;
 import io.druid.data.input.InputRow;
 import io.druid.data.input.MapBasedInputRow;
 import org.joda.time.DateTime;
@@ -73,8 +73,7 @@ public class MapInputRowParser implements InputRowParser<Map<String, Object>>
       }
     }
     catch (Exception e) {
-      log.error("Unparseable timestamp found!");
-      throw Throwables.propagate(e);
+      throw new ParseException(e, "Unparseable timestamp found!");
     }
 
     return new MapBasedInputRow(timestamp.getMillis(), dimensions, theMap);
