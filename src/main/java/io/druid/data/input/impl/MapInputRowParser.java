@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.metamx.common.exception.FormattedException;
+import com.metamx.common.logger.Logger;
+import com.metamx.common.parsers.ParseException;
 import io.druid.data.input.InputRow;
 import io.druid.data.input.MapBasedInputRow;
 import org.joda.time.DateTime;
@@ -14,6 +15,8 @@ import java.util.Map;
 
 public class MapInputRowParser implements InputRowParser<Map<String, Object>>
 {
+  private static final Logger log = new Logger(MapInputRowParser.class);
+
   private final ParseSpec parseSpec;
 
   @JsonCreator
@@ -44,7 +47,7 @@ public class MapInputRowParser implements InputRowParser<Map<String, Object>>
   }
 
   @Override
-  public InputRow parse(Map<String, Object> theMap) throws FormattedException
+  public InputRow parse(Map<String, Object> theMap) throws ParseException
   {
     final List<String> dimensions = parseSpec.getDimensionsSpec().hasCustomDimensions()
                                     ? parseSpec.getDimensionsSpec().getDimensions()
@@ -70,10 +73,7 @@ public class MapInputRowParser implements InputRowParser<Map<String, Object>>
       }
     }
     catch (Exception e) {
-      throw new FormattedException.Builder()
-          .withErrorCode(FormattedException.ErrorCode.UNPARSABLE_TIMESTAMP)
-          .withMessage(e.toString())
-          .build();
+      throw new ParseException(e, "Unparseable timestamp found!");
     }
 
     return new MapBasedInputRow(timestamp.getMillis(), dimensions, theMap);

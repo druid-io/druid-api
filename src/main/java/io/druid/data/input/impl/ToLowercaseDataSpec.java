@@ -1,6 +1,7 @@
 package io.druid.data.input.impl;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.metamx.common.parsers.ParseException;
 import com.metamx.common.parsers.Parser;
 import com.metamx.common.parsers.ToLowerCaseParser;
 
@@ -45,7 +46,7 @@ public class ToLowercaseDataSpec implements DataSpec
   }
 
   @Override
-  public Parser<String, Object> getParser()
+  public Parser<String, Object> getParser() throws ParseException
   {
     return new ToLowerCaseParser(delegate.getParser());
   }

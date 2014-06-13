@@ -16,7 +16,6 @@ import com.google.inject.ProvisionException;
 import com.google.inject.spi.Message;
 import com.metamx.common.logger.Logger;
 
-import javax.annotation.Nullable;
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
 import javax.validation.Path;
@@ -131,9 +130,8 @@ public class JsonConfigurator
               messages,
               new Function<String, Message>()
               {
-                @Nullable
                 @Override
-                public Message apply(@Nullable String input)
+                public Message apply(String input)
                 {
                   return new Message(String.format("%s%s", propertyBase, input));
                 }

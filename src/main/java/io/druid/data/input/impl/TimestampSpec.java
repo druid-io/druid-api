@@ -3,6 +3,8 @@ package io.druid.data.input.impl;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Function;
+import com.google.common.base.Throwables;
+import com.metamx.common.parsers.ParseException;
 import com.metamx.common.parsers.ParserUtils;
 import org.joda.time.DateTime;
 

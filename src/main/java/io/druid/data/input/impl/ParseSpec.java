@@ -3,6 +3,7 @@ package io.druid.data.input.impl;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.metamx.common.parsers.ParseException;
 import com.metamx.common.parsers.Parser;
 
 import java.util.List;
@@ -43,7 +44,7 @@ public abstract class ParseSpec
     // do nothing
   }
 
-  public Parser<String, Object> makeParser()
+  public Parser<String, Object> makeParser() throws ParseException
   {
     return null;
   }

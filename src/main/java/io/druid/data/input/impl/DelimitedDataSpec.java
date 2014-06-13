@@ -2,9 +2,11 @@ package io.druid.data.input.impl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.metamx.common.parsers.DelimitedParser;
+import com.metamx.common.parsers.ParseException;
 import com.metamx.common.parsers.Parser;
 
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.List;
 public class DelimitedDataSpec implements DataSpec
 {
   private final String delimiter;
+  private final String listDelimiter;
   private final List<String> columns;
   private final List<String> dimensions;
   private final List<SpatialDimensionSchema> spatialDimensions;
@@ -22,22 +25,30 @@ public class DelimitedDataSpec implements DataSpec
   @JsonCreator
   public DelimitedDataSpec(
       @JsonProperty("delimiter") String delimiter,
+      @JsonProperty("listDelimiter") String listDelimiter,
       @JsonProperty("columns") List<String> columns,
       @JsonProperty("dimensions") List<String> dimensions,
       @JsonProperty("spatialDimensions") List<SpatialDimensionSchema> spatialDimensions
   )
   {
+    this.delimiter = delimiter;
+    this.listDelimiter = listDelimiter;
+
     Preconditions.checkNotNull(columns);
     for (String column : columns) {
       Preconditions.checkArgument(!column.contains(","), "Column[%s] has a comma, it cannot", column);
     }
-
-    this.delimiter = (delimiter == null) ? DelimitedParser.DEFAULT_DELIMITER : delimiter;
     this.columns = columns;
     this.dimensions = dimensions;
     this.spatialDimensions = (spatialDimensions == null)
                              ? Lists.<SpatialDimensionSchema>newArrayList()
                              : spatialDimensions;
+  }
+
+  @JsonProperty
+  public String getListDelimiter()
+  {
+    return listDelimiter;
   }
 
   @JsonProperty("delimiter")
@@ -81,9 +92,12 @@ public class DelimitedDataSpec implements DataSpec
   }
 
   @Override
-  public Parser<String, Object> getParser()
+  public Parser<String, Object> getParser() throws ParseException
   {
-    Parser<String, Object> retVal = new DelimitedParser(delimiter);
+    Parser<String, Object> retVal = new DelimitedParser(
+        Optional.fromNullable(delimiter),
+        Optional.fromNullable(listDelimiter)
+    );
     retVal.setFieldNames(columns);
     return retVal;
   }
@@ -97,6 +111,7 @@ public class DelimitedDataSpec implements DataSpec
         timestampSpec,
         new DimensionsSpec(dimensions, dimensionExclusions, spatialDimensions),
         delimiter,
+        listDelimiter,
         columns
     );
   }

@@ -31,16 +31,8 @@ public class CompressionUtils
       log.warn("No .zip suffix[%s], putting files from [%s] into it anyway.", outputZipFile, directory);
     }
 
-    final FileOutputStream out = new FileOutputStream(outputZipFile);
-    try {
-      final long retVal = zip(directory, out);
-
-      out.close();
-
-      return retVal;
-    }
-    finally {
-      Closeables.closeQuietly(out);
+    try (final FileOutputStream out = new FileOutputStream(outputZipFile)) {
+      return zip(directory, out);
     }
   }
 
@@ -98,15 +90,9 @@ public class CompressionUtils
 
     ZipEntry entry;
     while ((entry = zipIn.getNextEntry()) != null) {
-      FileOutputStream out = null;
-      try {
-        out = new FileOutputStream(new File(outDir, entry.getName()));
+      try (FileOutputStream out = new FileOutputStream(new File(outDir, entry.getName()))){
         ByteStreams.copy(zipIn, out);
         zipIn.closeEntry();
-        out.close();
-      }
-      finally {
-        Closeables.closeQuietly(out);
       }
     }
   }

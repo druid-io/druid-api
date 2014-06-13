@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
-import com.metamx.common.exception.FormattedException;
+import com.metamx.common.logger.Logger;
+import com.metamx.common.parsers.ParseException;
 import com.metamx.common.parsers.Parser;
 import com.metamx.common.parsers.ToLowerCaseParser;
 import io.druid.data.input.ByteBufferInputRowParser;
@@ -21,6 +22,8 @@ import java.util.Map;
  */
 public class StringInputRowParser implements ByteBufferInputRowParser
 {
+  private static final Logger log = new Logger(StringInputRowParser.class);
+
   private final ParseSpec parseSpec;
   private final MapInputRowParser mapParser;
   private final Parser<String, Object> parser;
@@ -35,7 +38,7 @@ public class StringInputRowParser implements ByteBufferInputRowParser
       @JsonProperty("data") final DataSpec dataSpec,
       @JsonProperty("dimensions") List<String> dimensions,
       @JsonProperty("dimensionExclusions") List<String> dimensionExclusions
-  )
+  ) throws ParseException
   {
     if (parseSpec == null) {
       if (dataSpec == null) {
@@ -60,7 +63,7 @@ public class StringInputRowParser implements ByteBufferInputRowParser
   }
 
   @Override
-  public InputRow parse(ByteBuffer input) throws FormattedException
+  public InputRow parse(ByteBuffer input) throws ParseException
   {
     return parseMap(buildStringKeyMap(input));
   }
@@ -73,12 +76,12 @@ public class StringInputRowParser implements ByteBufferInputRowParser
   }
 
   @Override
-  public StringInputRowParser withParseSpec(ParseSpec parseSpec)
+  public StringInputRowParser withParseSpec(ParseSpec parseSpec) throws ParseException
   {
     return new StringInputRowParser(parseSpec, null, null, null, null);
   }
 
-  private Map<String, Object> buildStringKeyMap(ByteBuffer input)
+  private Map<String, Object> buildStringKeyMap(ByteBuffer input) throws ParseException
   {
     int payloadSize = input.remaining();
 
@@ -87,9 +90,9 @@ public class StringInputRowParser implements ByteBufferInputRowParser
     }
 
     final CoderResult coderResult = Charsets.UTF_8.newDecoder()
-                                            .onMalformedInput(CodingErrorAction.REPLACE)
-                                            .onUnmappableCharacter(CodingErrorAction.REPLACE)
-                                            .decode(input, chars, true);
+                                                  .onMalformedInput(CodingErrorAction.REPLACE)
+                                                  .onUnmappableCharacter(CodingErrorAction.REPLACE)
+                                                  .decode(input, chars, true);
 
     Map<String, Object> theMap;
     if (coderResult.isUnderflow()) {
@@ -101,25 +104,22 @@ public class StringInputRowParser implements ByteBufferInputRowParser
         chars.clear();
       }
     } else {
-      throw new FormattedException.Builder()
-          .withErrorCode(FormattedException.ErrorCode.UNPARSABLE_ROW)
-          .withMessage(String.format("Failed with CoderResult[%s]", coderResult))
-          .build();
+      throw new ParseException("Failed with CoderResult[%s]", coderResult);
     }
     return theMap;
   }
 
-  private Map<String, Object> parseString(String inputString)
+  private Map<String, Object> parseString(String inputString) throws ParseException
   {
     return parser.parse(inputString);
   }
 
-  public InputRow parse(String input) throws FormattedException
+  public InputRow parse(String input) throws ParseException
   {
     return parseMap(parseString(input));
   }
 
-  private InputRow parseMap(Map<String, Object> theMap)
+  private InputRow parseMap(Map<String, Object> theMap) throws ParseException
   {
     return mapParser.parse(theMap);
   }
