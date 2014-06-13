@@ -12,9 +12,9 @@ import io.druid.data.input.InputRow;
 })
 public interface InputRowParser<T>
 {
-  public InputRow parse(T input) throws ParseException;
+  public InputRow parse(T input) ;
 
   public ParseSpec getParseSpec();
 
-  public InputRowParser withParseSpec(ParseSpec parseSpec) throws ParseException;
+  public InputRowParser withParseSpec(ParseSpec parseSpec) ;
 }

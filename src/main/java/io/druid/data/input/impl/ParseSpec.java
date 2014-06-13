@@ -44,7 +44,7 @@ public abstract class ParseSpec
     // do nothing
   }
 
-  public Parser<String, Object> makeParser() throws ParseException
+  public Parser<String, Object> makeParser()
   {
     return null;
   }

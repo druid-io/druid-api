@@ -46,7 +46,7 @@ public class ToLowercaseDataSpec implements DataSpec
   }
 
   @Override
-  public Parser<String, Object> getParser() throws ParseException
+  public Parser<String, Object> getParser()
   {
     return new ToLowerCaseParser(delegate.getParser());
   }

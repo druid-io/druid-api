@@ -1,5 +1,7 @@
 package io.druid.data.input;
 
+import com.metamx.common.parsers.ParseException;
+
 import java.io.Closeable;
 
 /**
@@ -34,7 +36,7 @@ public interface Firehose extends Closeable
    *
    * @return The next row
    */
-  public InputRow nextRow();
+  public InputRow nextRow() ;
 
   /**
    * Returns a runnable that will "commit" everything read up to the point at which commit() is called.  This is

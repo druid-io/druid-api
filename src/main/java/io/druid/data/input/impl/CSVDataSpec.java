@@ -84,7 +84,7 @@ public class CSVDataSpec implements DataSpec
   }
 
   @Override
-  public Parser<String, Object> getParser() throws ParseException
+  public Parser<String, Object> getParser()
   {
     return new CSVParser(Optional.fromNullable(listDelimiter), columns);
   }

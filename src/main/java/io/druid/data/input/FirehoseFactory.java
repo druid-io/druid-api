@@ -1,6 +1,7 @@
 package io.druid.data.input;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.metamx.common.parsers.ParseException;
 import io.druid.data.input.impl.InputRowParser;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ public interface FirehoseFactory<T extends InputRowParser>
    * value will throw a surprising NPE.   Throwing IOException on connection failure or runtime exception on
    * invalid configuration is preferred over returning null.
    */
-  public Firehose connect(T parser) throws IOException;
+  public Firehose connect(T parser) throws IOException, ParseException;
 
   @Deprecated
   public InputRowParser getParser();

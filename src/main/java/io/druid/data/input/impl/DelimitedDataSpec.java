@@ -92,7 +92,7 @@ public class DelimitedDataSpec implements DataSpec
   }
 
   @Override
-  public Parser<String, Object> getParser() throws ParseException
+  public Parser<String, Object> getParser()
   {
     Parser<String, Object> retVal = new DelimitedParser(
         Optional.fromNullable(delimiter),

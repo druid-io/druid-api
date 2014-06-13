@@ -38,7 +38,7 @@ public class StringInputRowParser implements ByteBufferInputRowParser
       @JsonProperty("data") final DataSpec dataSpec,
       @JsonProperty("dimensions") List<String> dimensions,
       @JsonProperty("dimensionExclusions") List<String> dimensionExclusions
-  ) throws ParseException
+  )
   {
     if (parseSpec == null) {
       if (dataSpec == null) {
@@ -63,7 +63,7 @@ public class StringInputRowParser implements ByteBufferInputRowParser
   }
 
   @Override
-  public InputRow parse(ByteBuffer input) throws ParseException
+  public InputRow parse(ByteBuffer input)
   {
     return parseMap(buildStringKeyMap(input));
   }
@@ -76,12 +76,12 @@ public class StringInputRowParser implements ByteBufferInputRowParser
   }
 
   @Override
-  public StringInputRowParser withParseSpec(ParseSpec parseSpec) throws ParseException
+  public StringInputRowParser withParseSpec(ParseSpec parseSpec)
   {
     return new StringInputRowParser(parseSpec, null, null, null, null);
   }
 
-  private Map<String, Object> buildStringKeyMap(ByteBuffer input) throws ParseException
+  private Map<String, Object> buildStringKeyMap(ByteBuffer input)
   {
     int payloadSize = input.remaining();
 
@@ -109,17 +109,17 @@ public class StringInputRowParser implements ByteBufferInputRowParser
     return theMap;
   }
 
-  private Map<String, Object> parseString(String inputString) throws ParseException
+  private Map<String, Object> parseString(String inputString)
   {
     return parser.parse(inputString);
   }
 
-  public InputRow parse(String input) throws ParseException
+  public InputRow parse(String input)
   {
     return parseMap(parseString(input));
   }
 
-  private InputRow parseMap(Map<String, Object> theMap) throws ParseException
+  private InputRow parseMap(Map<String, Object> theMap)
   {
     return mapParser.parse(theMap);
   }
