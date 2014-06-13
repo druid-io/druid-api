@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
-import com.metamx.common.IAE;
 import com.metamx.common.logger.Logger;
 import com.metamx.common.parsers.ParseException;
 import com.metamx.common.parsers.Parser;
@@ -105,7 +104,7 @@ public class StringInputRowParser implements ByteBufferInputRowParser
         chars.clear();
       }
     } else {
-      throw new IAE("Failed with CoderResult[%s]", coderResult);
+      throw new ParseException("Failed with CoderResult[%s]", coderResult);
     }
     return theMap;
   }
