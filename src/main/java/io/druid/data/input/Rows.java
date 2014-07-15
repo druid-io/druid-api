@@ -22,7 +22,7 @@ public class Rows
       TreeMap<String, Object> caseInsensitiveMap = Maps.newTreeMap(String.CASE_INSENSITIVE_ORDER);
       caseInsensitiveMap.putAll(mapBasedRow.getEvent());
       return new MapBasedInputRow(
-          mapBasedRow.getTimestampFromEpoch(),
+          mapBasedRow.getTimestamp(),
           dimensions,
           caseInsensitiveMap
       );
