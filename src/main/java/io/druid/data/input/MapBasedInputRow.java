@@ -21,6 +21,16 @@ public class MapBasedInputRow extends MapBasedRow implements InputRow
     this.dimensions = dimensions;
   }
 
+  public MapBasedInputRow(
+      DateTime timestamp,
+      List<String> dimensions,
+      Map<String, Object> event
+  )
+  {
+    super(timestamp, event);
+    this.dimensions = dimensions;
+  }
+
   @Override
   public List<String> getDimensions()
   {

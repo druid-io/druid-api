@@ -46,6 +46,18 @@ public class MapBasedRow implements Row
     return timestamp.getMillis();
   }
 
+  @JsonProperty
+  public DateTime getTimestamp()
+  {
+    return timestamp;
+  }
+
+  @JsonProperty
+  public Map<String, Object> getEvent()
+  {
+    return event;
+  }
+
   @Override
   public List<String> getDimension(String dimension)
   {
@@ -100,19 +112,6 @@ public class MapBasedRow implements Row
       throw new ParseException("Unknown type[%s]", metricValue.getClass());
     }
   }
-
-  @JsonProperty
-  public DateTime getTimestamp()
-  {
-    return timestamp;
-  }
-
-  @JsonProperty
-  public Map<String, Object> getEvent()
-  {
-    return event;
-  }
-
   @Override
   public String toString()
   {
@@ -150,5 +149,11 @@ public class MapBasedRow implements Row
     int result = timestamp.hashCode();
     result = 31 * result + event.hashCode();
     return result;
+  }
+
+  @Override
+  public int compareTo(Row o)
+  {
+    return timestamp.compareTo(o.getTimestamp());
   }
 }
