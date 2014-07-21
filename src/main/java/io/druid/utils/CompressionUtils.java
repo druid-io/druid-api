@@ -5,6 +5,7 @@ import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 import com.metamx.common.ISE;
 import com.metamx.common.StreamUtils;
+import com.metamx.common.guava.CloseQuietly;
 import com.metamx.common.logger.Logger;
 
 import java.io.BufferedInputStream;
@@ -80,7 +81,7 @@ public class CompressionUtils
       unzip(in, outDir);
     }
     finally {
-      Closeables.closeQuietly(in);
+      CloseQuietly.close(in);
     }
   }
 
