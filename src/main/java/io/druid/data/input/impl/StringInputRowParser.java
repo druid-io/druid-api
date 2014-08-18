@@ -54,11 +54,11 @@ public class StringInputRowParser implements ByteBufferInputRowParser
         this.parseSpec = dataSpec.toParseSpec(timestampSpec, dimensionExclusions);
       }
       this.mapParser = new MapInputRowParser(this.parseSpec, null, null, null, null);
-      this.parser = new ToLowerCaseParser(this.parseSpec.makeParser());
+      this.parser = this.parseSpec.makeParser();
     } else {
       this.parseSpec = parseSpec;
       this.mapParser = new MapInputRowParser(parseSpec, null, null, null, null);
-      this.parser = new ToLowerCaseParser(parseSpec.makeParser());
+      this.parser = parseSpec.makeParser();
     }
   }
 
