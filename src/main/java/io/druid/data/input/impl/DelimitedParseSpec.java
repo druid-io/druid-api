@@ -45,6 +45,12 @@ public class DelimitedParseSpec extends ParseSpec
     return delimiter;
   }
 
+  @JsonProperty("listDelimiter")
+  public String getListDelimiter()
+  {
+    return listDelimiter;
+  }
+
   @JsonProperty("columns")
   public List<String> getColumns()
   {
