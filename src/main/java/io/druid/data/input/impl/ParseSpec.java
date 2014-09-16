@@ -24,7 +24,7 @@ public abstract class ParseSpec
   protected ParseSpec(TimestampSpec timestampSpec, DimensionsSpec dimensionsSpec)
   {
     this.timestampSpec = timestampSpec;
-    this.dimensionsSpec = dimensionsSpec.withDimensionExclusions(Sets.newHashSet(timestampSpec.getTimestampColumn()));
+    this.dimensionsSpec = dimensionsSpec;
   }
 
   @JsonProperty

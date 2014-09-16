@@ -63,7 +63,11 @@ public class DimensionsSpec
 
   public DimensionsSpec withDimensionExclusions(Set<String> dimExs)
   {
-    return new DimensionsSpec(dimensions, ImmutableList.copyOf(dimExs), spatialDimensions);
+    return new DimensionsSpec(
+        dimensions,
+        ImmutableList.copyOf(Sets.union(dimensionExclusions, dimExs)),
+        spatialDimensions
+    );
   }
 
   public DimensionsSpec withSpatialDimensions(List<SpatialDimensionSchema> spatials)
