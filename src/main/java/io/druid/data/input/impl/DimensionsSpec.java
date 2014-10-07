@@ -2,6 +2,7 @@ package io.druid.data.input.impl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -9,8 +10,6 @@ import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Set;
 
-/**
- */
 public class DimensionsSpec
 {
   private final List<String> dimensions;
@@ -28,6 +27,10 @@ public class DimensionsSpec
     this.dimensionExclusions = (dimensionExclusions == null)
                                ? Sets.<String>newHashSet()
                                : Sets.newHashSet(dimensionExclusions);
+    Preconditions.checkArgument(
+        Sets.intersection(this.dimensionExclusions, Sets.newHashSet(this.dimensions)).isEmpty(),
+        "dimensions and dimensions exclusions cannot overlap"
+    );
     this.spatialDimensions = (spatialDimensions == null)
                              ? Lists.<SpatialDimensionSchema>newArrayList()
                              : spatialDimensions;

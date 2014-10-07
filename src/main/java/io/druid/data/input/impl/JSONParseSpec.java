@@ -52,7 +52,7 @@ public class JSONParseSpec extends ParseSpec
   @Override
   public Parser<String, Object> makeParser()
   {
-    return new JSONParser(objectMapper, null);
+    return new JSONParser(objectMapper, null, getDimensionsSpec().getDimensionExclusions());
   }
 
   @Override
