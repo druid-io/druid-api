@@ -66,8 +66,7 @@ public class JSONDataSpec implements DataSpec
   {
     return new JSONParseSpec(
         timestampSpec,
-        new DimensionsSpec(dimensions, dimensionExclusions, spatialDimensions),
-        JSONParseSpec.JSON
+        new DimensionsSpec(dimensions, dimensionExclusions, spatialDimensions)
     );
   }
 }
