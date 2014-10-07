@@ -48,7 +48,8 @@ public class StringInputRowParser implements ByteBufferInputRowParser
                 dimensions,
                 dimensionExclusions,
                 ImmutableList.<SpatialDimensionSchema>of()
-            )
+            ),
+            JSONParseSpec.JSON
         );
       } else {
         this.parseSpec = dataSpec.toParseSpec(timestampSpec, dimensionExclusions);
