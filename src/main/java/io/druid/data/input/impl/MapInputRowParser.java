@@ -39,7 +39,8 @@ public class MapInputRowParser implements InputRowParser<Map<String, Object>>
       }
       this.parseSpec = new JSONParseSpec(
           timestampSpec,
-          new DimensionsSpec(dimensions, dimensionExclusions, spatialDimensions)
+          new DimensionsSpec(dimensions, dimensionExclusions, spatialDimensions),
+          JSONParseSpec.JSON
       );
     } else {
       this.parseSpec = parseSpec;

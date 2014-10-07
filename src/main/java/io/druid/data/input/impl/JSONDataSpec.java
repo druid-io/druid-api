@@ -64,6 +64,10 @@ public class JSONDataSpec implements DataSpec
       TimestampSpec timestampSpec, List<String> dimensionExclusions
   )
   {
-    return new JSONParseSpec(timestampSpec, new DimensionsSpec(dimensions, dimensionExclusions, spatialDimensions));
+    return new JSONParseSpec(
+        timestampSpec,
+        new DimensionsSpec(dimensions, dimensionExclusions, spatialDimensions),
+        JSONParseSpec.JSON
+    );
   }
 }
