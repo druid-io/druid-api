@@ -4,14 +4,14 @@
     <groupId>io.druid</groupId>
     <artifactId>druid-api</artifactId>
     <packaging>jar</packaging>
-    <version>0.2.14</version>
+    <version>0.2.15-SNAPSHOT</version>
     <name>druid-api</name>
     <description>druid-api</description>
     <scm>
         <connection>scm:git:ssh://git@github.com/druid-io/druid-api.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/druid-io/druid-api.git</developerConnection>
         <url>http://www.github.com/druid-io/druid-api</url>
-        <tag>druid-api-0.2.14</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <prerequisites>
