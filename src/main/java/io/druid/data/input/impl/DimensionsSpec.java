@@ -5,8 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +25,13 @@ public class DimensionsSpec
       @JsonProperty("spatialDimensions") List<SpatialDimensionSchema> spatialDimensions
   )
   {
-    this.dimensions = dimensions == null ? Lists.<String>newArrayList() : dimensions;
+    this.dimensions = dimensions == null
+                      ? Lists.<String>newArrayList()
+                      : Lists.newArrayList(dimensions);
+
+    // Small work around for https://github.com/metamx/druid/issues/658
+    Collections.sort(this.dimensions, Ordering.natural().nullsFirst());
+
     this.dimensionExclusions = (dimensionExclusions == null)
                                ? Sets.<String>newHashSet()
                                : Sets.newHashSet(dimensionExclusions);
