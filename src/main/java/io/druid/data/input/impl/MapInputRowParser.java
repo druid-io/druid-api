@@ -15,35 +15,14 @@ import java.util.Map;
 
 public class MapInputRowParser implements InputRowParser<Map<String, Object>>
 {
-  private static final Logger log = new Logger(MapInputRowParser.class);
-
   private final ParseSpec parseSpec;
 
   @JsonCreator
   public MapInputRowParser(
-      @JsonProperty("parseSpec") ParseSpec parseSpec,
-      // Backwards compatible
-      @JsonProperty("timestampSpec") TimestampSpec timestampSpec,
-      @JsonProperty("dimensions") List<String> dimensions,
-      @JsonProperty("dimensionExclusions") List<String> dimensionExclusions,
-      @JsonProperty("spatialDimensions") List<SpatialDimensionSchema> spatialDimensions
+      @JsonProperty("parseSpec") ParseSpec parseSpec
   )
   {
-    // Backwards compatible
-    if (parseSpec == null) {
-      if (dimensionExclusions == null) {
-        dimensionExclusions = Lists.newArrayList();
-      }
-      if (timestampSpec != null) {
-        dimensionExclusions.add(timestampSpec.getTimestampColumn());
-      }
-      this.parseSpec = new JSONParseSpec(
-          timestampSpec,
-          new DimensionsSpec(dimensions, dimensionExclusions, spatialDimensions)
-      );
-    } else {
-      this.parseSpec = parseSpec;
-    }
+    this.parseSpec = parseSpec;
   }
 
   @Override
@@ -89,6 +68,6 @@ public class MapInputRowParser implements InputRowParser<Map<String, Object>>
   @Override
   public InputRowParser withParseSpec(ParseSpec parseSpec)
   {
-    return new MapInputRowParser(parseSpec, null, null, null, null);
+    return new MapInputRowParser(parseSpec);
   }
 }
