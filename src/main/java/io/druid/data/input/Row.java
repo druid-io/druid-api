@@ -72,4 +72,15 @@ public interface Row extends Comparable<Row>
    * @return the float value for the provided column name.
    */
   public float getFloatMetric(String metric);
+
+  /**
+   * Returns the long value of the given metric column.
+   * <p/>
+   * Column names are always all lowercase in order to support case-insensitive schemas.
+   *
+   * @param metric the lowercase column name of the metric requested
+   *
+   * @return the long value for the provided column name.
+   */
+  public long getLongMetric(String metric);
 }
