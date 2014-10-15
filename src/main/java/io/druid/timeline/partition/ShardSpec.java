@@ -11,7 +11,7 @@ import java.util.Set;
 public interface ShardSpec
 {
   public <T> PartitionChunk<T> createChunk(T obj);
-  public boolean isInChunk(InputRow inputRow);
+  public boolean isInChunk(long timestamp, InputRow inputRow);
   public int getPartitionNum();
   public ShardSpecLookup getLookup(List<ShardSpec> shardSpecs);
 }
