@@ -4,5 +4,5 @@ import io.druid.data.input.InputRow;
 
 public interface ShardSpecLookup
 {
-  ShardSpec getShardSpec(InputRow row);
+  ShardSpec getShardSpec(long timestamp, InputRow row);
 }
