@@ -1,6 +1,7 @@
 package io.druid.tasklogs;
 
 import com.google.common.base.Optional;
+import com.google.common.io.ByteSource;
 import com.google.common.io.InputSupplier;
 import com.metamx.common.logger.Logger;
 
@@ -13,7 +14,7 @@ public class NoopTaskLogs implements TaskLogs
   private final Logger log = new Logger(TaskLogs.class);
 
   @Override
-  public Optional<InputSupplier<InputStream>> streamTaskLog(String taskid, long offset) throws IOException
+  public Optional<ByteSource> streamTaskLog(String taskid, long offset) throws IOException
   {
     return Optional.absent();
   }

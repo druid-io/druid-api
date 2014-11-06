@@ -1,6 +1,7 @@
 package io.druid.tasklogs;
 
 import com.google.common.base.Optional;
+import com.google.common.io.ByteSource;
 import com.google.common.io.InputSupplier;
 
 import java.io.IOException;
@@ -19,5 +20,5 @@ public interface TaskLogStreamer
    *
    * @return input supplier for this log, if available from this provider
    */
-  public Optional<InputSupplier<InputStream>> streamTaskLog(String taskid, long offset) throws IOException;
+  public Optional<ByteSource> streamTaskLog(String taskid, long offset) throws IOException;
 }
