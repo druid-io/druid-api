@@ -112,6 +112,30 @@ public class MapBasedRow implements Row
       throw new ParseException("Unknown type[%s]", metricValue.getClass());
     }
   }
+
+  @Override
+  public long getLongMetric(String metric)
+  {
+    Object metricValue = event.get(metric);
+
+    if (metricValue == null) {
+      return 0L;
+    }
+
+    if (metricValue instanceof Number) {
+      return ((Number) metricValue).longValue();
+    } else if (metricValue instanceof String) {
+      try {
+        return Long.valueOf(((String) metricValue).replace(",", ""));
+      }
+      catch (Exception e) {
+        throw new ParseException(e, "Unable to parse metrics[%s], value[%s]", metric, metricValue);
+      }
+    } else {
+      throw new ParseException("Unknown type[%s]", metricValue.getClass());
+    }
+  }
+
   @Override
   public String toString()
   {

@@ -42,7 +42,29 @@ public class PolyBind
       Key<? extends T> defaultKey
   )
   {
-    return binder.bind(interfaceKey).toProvider(new ConfiggedProvider<T>(interfaceKey, property, defaultKey));
+    return createChoiceWithDefault(binder, property, interfaceKey, defaultKey, null);
+  }
+
+  /**
+   * Sets up a "choice" for the injector to resolve at injection time.
+   *
+   * @param binder the binder for the injector that is being configured
+   * @param property the property that will be checked to determine the implementation choice
+   * @param interfaceKey the interface that will be injected using this choice
+   * @param defaultKey the default instance to be injected if the property doesn't match a choice.  Can be null
+   * @param defaultPropertyValue the default property value to use if the property is not set.
+   * @param <T> interface type
+   * @return A ScopedBindingBuilder so that scopes can be added to the binding, if required.
+   */
+  public static <T> ScopedBindingBuilder createChoiceWithDefault(
+      Binder binder,
+      String property,
+      Key<T> interfaceKey,
+      Key<? extends T> defaultKey,
+      String defaultPropertyValue
+  )
+  {
+    return binder.bind(interfaceKey).toProvider(new ConfiggedProvider<T>(interfaceKey, property, defaultKey, defaultPropertyValue));
   }
 
   /**
@@ -78,6 +100,7 @@ public class PolyBind
     private final Key<T> key;
     private final String property;
     private final Key<? extends T> defaultKey;
+    private final String defaultPropertyValue;
 
     private Injector injector;
     private Properties props;
@@ -85,12 +108,14 @@ public class PolyBind
     ConfiggedProvider(
         Key<T> key,
         String property,
-        Key<? extends T> defaultKey
+        Key<? extends T> defaultKey,
+        String defaultPropertyValue
     )
     {
       this.key = key;
       this.property = property;
       this.defaultKey = defaultKey;
+      this.defaultPropertyValue = defaultPropertyValue;
     }
 
     @Inject
@@ -119,7 +144,10 @@ public class PolyBind
         implsMap = (Map<String, Provider<T>>) injector.getInstance(Key.get(mapType));
       }
 
-      final String implName = props.getProperty(property);
+      String implName = props.getProperty(property);
+      if (implName == null) {
+        implName = defaultPropertyValue;
+      }
       final Provider<T> provider = implsMap.get(implName);
 
       if (provider == null) {
