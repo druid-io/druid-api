@@ -22,8 +22,6 @@ import java.util.Map;
  */
 public class StringInputRowParser implements ByteBufferInputRowParser
 {
-  private static final Logger log = new Logger(StringInputRowParser.class);
-
   private final ParseSpec parseSpec;
   private final MapInputRowParser mapParser;
   private final Parser<String, Object> parser;
@@ -32,34 +30,12 @@ public class StringInputRowParser implements ByteBufferInputRowParser
 
   @JsonCreator
   public StringInputRowParser(
-      @JsonProperty("parseSpec") ParseSpec parseSpec,
-      // Backwards compatible
-      @JsonProperty("timestampSpec") TimestampSpec timestampSpec,
-      @JsonProperty("data") final DataSpec dataSpec,
-      @JsonProperty("dimensions") List<String> dimensions,
-      @JsonProperty("dimensionExclusions") List<String> dimensionExclusions
+      @JsonProperty("parseSpec") ParseSpec parseSpec
   )
   {
-    if (parseSpec == null) {
-      if (dataSpec == null) {
-        this.parseSpec = new JSONParseSpec(
-            timestampSpec,
-            new DimensionsSpec(
-                dimensions,
-                dimensionExclusions,
-                ImmutableList.<SpatialDimensionSchema>of()
-            )
-        );
-      } else {
-        this.parseSpec = dataSpec.toParseSpec(timestampSpec, dimensionExclusions);
-      }
-      this.mapParser = new MapInputRowParser(this.parseSpec, null, null, null, null);
-      this.parser = new ToLowerCaseParser(this.parseSpec.makeParser());
-    } else {
-      this.parseSpec = parseSpec;
-      this.mapParser = new MapInputRowParser(parseSpec, null, null, null, null);
-      this.parser = new ToLowerCaseParser(parseSpec.makeParser());
-    }
+    this.parseSpec = parseSpec;
+    this.mapParser = new MapInputRowParser(parseSpec);
+    this.parser = new ToLowerCaseParser(parseSpec.makeParser());
   }
 
   @Override
@@ -78,7 +54,7 @@ public class StringInputRowParser implements ByteBufferInputRowParser
   @Override
   public StringInputRowParser withParseSpec(ParseSpec parseSpec)
   {
-    return new StringInputRowParser(parseSpec, null, null, null, null);
+    return new StringInputRowParser(parseSpec);
   }
 
   private Map<String, Object> buildStringKeyMap(ByteBuffer input)
