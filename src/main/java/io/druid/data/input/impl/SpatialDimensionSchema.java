@@ -2,8 +2,6 @@ package io.druid.data.input.impl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 
 import java.util.List;
 
@@ -20,18 +18,8 @@ public class SpatialDimensionSchema
       @JsonProperty("dims") List<String> dims
   )
   {
-    this.dimName = dimName.toLowerCase();
-    this.dims = Lists.transform(
-        dims,
-        new Function<String, String>()
-        {
-          @Override
-          public String apply(String input)
-          {
-            return input.toLowerCase();
-          }
-        }
-    );
+    this.dimName = dimName;
+    this.dims = dims;
   }
 
   @JsonProperty

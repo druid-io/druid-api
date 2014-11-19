@@ -83,7 +83,7 @@ public class DataSegment implements Comparable<DataSegment>
       }
     };
 
-    this.dataSource = dataSource.toLowerCase();
+    this.dataSource = dataSource;
     this.interval = interval;
     this.loadSpec = loadSpec;
     this.version = version;

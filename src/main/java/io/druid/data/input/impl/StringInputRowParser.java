@@ -3,11 +3,8 @@ package io.druid.data.input.impl;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableList;
-import com.metamx.common.logger.Logger;
 import com.metamx.common.parsers.ParseException;
 import com.metamx.common.parsers.Parser;
-import com.metamx.common.parsers.ToLowerCaseParser;
 import io.druid.data.input.ByteBufferInputRowParser;
 import io.druid.data.input.InputRow;
 
@@ -15,7 +12,6 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,7 +31,7 @@ public class StringInputRowParser implements ByteBufferInputRowParser
   {
     this.parseSpec = parseSpec;
     this.mapParser = new MapInputRowParser(parseSpec);
-    this.parser = new ToLowerCaseParser(parseSpec.makeParser());
+    this.parser = parseSpec.makeParser();
   }
 
   @Override
