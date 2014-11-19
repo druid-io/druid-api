@@ -2,6 +2,7 @@ package io.druid.data.input.impl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metamx.common.parsers.JSONParser;
 import com.metamx.common.parsers.Parser;
 
@@ -11,6 +12,8 @@ import java.util.List;
  */
 public class JSONParseSpec extends ParseSpec
 {
+  private final ObjectMapper objectMapper;
+
   @JsonCreator
   public JSONParseSpec(
       @JsonProperty("timestampSpec") TimestampSpec timestampSpec,
@@ -18,6 +21,7 @@ public class JSONParseSpec extends ParseSpec
   )
   {
     super(timestampSpec, dimensionsSpec);
+    this.objectMapper = new ObjectMapper();
   }
 
   @Override
@@ -28,7 +32,7 @@ public class JSONParseSpec extends ParseSpec
   @Override
   public Parser<String, Object> makeParser()
   {
-    return new JSONParser();
+    return new JSONParser(objectMapper, null);
   }
 
   @Override

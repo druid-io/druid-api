@@ -3,7 +3,7 @@ package io.druid.data.input.impl;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.metamx.common.parsers.ParseException;
+import com.google.common.collect.Sets;
 import com.metamx.common.parsers.Parser;
 
 import java.util.List;

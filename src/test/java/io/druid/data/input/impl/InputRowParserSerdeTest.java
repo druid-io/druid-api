@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import io.druid.TestObjectMapper;
 import io.druid.data.input.ByteBufferInputRowParser;
 import io.druid.data.input.InputRow;
@@ -24,8 +25,7 @@ public class InputRowParserSerdeTest
         new JSONParseSpec(
             new TimestampSpec("timestamp", "iso"),
             new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null)
-        ),
-        null, null, null, null
+        )
     );
     final ByteBufferInputRowParser parser2 = jsonMapper.readValue(
         jsonMapper.writeValueAsBytes(parser),
@@ -36,7 +36,7 @@ public class InputRowParserSerdeTest
             "{\"foo\":\"x\",\"bar\":\"y\",\"qux\":\"z\",\"timestamp\":\"2000\"}".getBytes(Charsets.UTF_8)
         )
     );
-    Assert.assertEquals(ImmutableList.of("foo", "bar"), parsed.getDimensions());
+    Assert.assertEquals(ImmutableList.of("bar", "foo"), parsed.getDimensions());
     Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension("foo"));
     Assert.assertEquals(ImmutableList.of("y"), parsed.getDimension("bar"));
     Assert.assertEquals(new DateTime("2000").getMillis(), parsed.getTimestampFromEpoch());
@@ -49,8 +49,7 @@ public class InputRowParserSerdeTest
         new JSONParseSpec(
             new TimestampSpec("timeposix", "posix"),
             new DimensionsSpec(ImmutableList.of("foo", "bar"), ImmutableList.of("baz"), null)
-        ),
-        null, null, null, null
+        )
     );
     final MapInputRowParser parser2 = jsonMapper.readValue(
         jsonMapper.writeValueAsBytes(parser),
@@ -64,26 +63,43 @@ public class InputRowParserSerdeTest
             "timeposix", "1"
         )
     );
-    Assert.assertEquals(ImmutableList.of("foo", "bar"), parsed.getDimensions());
+    Assert.assertEquals(ImmutableList.of("bar", "foo"), parsed.getDimensions());
     Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension("foo"));
     Assert.assertEquals(ImmutableList.of("y"), parsed.getDimension("bar"));
     Assert.assertEquals(1000, parsed.getTimestampFromEpoch());
   }
 
   @Test
-  public void testMapInputRowParserSerdeBackwardsCompatibility() throws Exception
+  public void testMapInputRowParserNumbersSerde() throws Exception
   {
-    final String json = "{\"timestampSpec\":{\"column\":\"time\",\"format\":\"posix\"},\"dimensions\":[\"dim1\"],\"dimensionExclusions\":[\"time\"]}}";
-    final InputRowParser parser = jsonMapper.readValue(json, InputRowParser.class);
-    final MapInputRowParser mapInputRowParser = new MapInputRowParser(parser.getParseSpec(), null, null, null, null);
-    final InputRow parsed = mapInputRowParser.parse(
-        ImmutableMap.<String, Object>of(
-            "dim1", "x",
-            "time", "1"
+    final MapInputRowParser parser = new MapInputRowParser(
+        new JSONParseSpec(
+            new TimestampSpec("timemillis", "millis"),
+            new DimensionsSpec(ImmutableList.of("foo", "values"), ImmutableList.of("toobig", "value"), null)
         )
     );
-    Assert.assertEquals(ImmutableList.of("dim1"), parsed.getDimensions());
-    Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension("dim1"));
-    Assert.assertEquals(1000, parsed.getTimestampFromEpoch());
+    final MapInputRowParser parser2 = jsonMapper.readValue(
+        jsonMapper.writeValueAsBytes(parser),
+        MapInputRowParser.class
+    );
+    final InputRow parsed = parser2.parse(
+        ImmutableMap.<String, Object>of(
+            "timemillis", 1412705931123L,
+            "toobig", 123E64,
+            "value", 123.456,
+            "long", 123456789000L,
+            "values", Lists.newArrayList(1412705931123L, 123.456, 123E45, "hello")
+        )
+    );
+    Assert.assertEquals(ImmutableList.of("foo", "values"), parsed.getDimensions());
+    Assert.assertEquals(ImmutableList.of(), parsed.getDimension("foo"));
+    Assert.assertEquals(ImmutableList.of("1412705931123", "123.456", "1.23E47", "hello"), parsed.getDimension("values"));
+    Assert.assertEquals(Float.POSITIVE_INFINITY, parsed.getFloatMetric("toobig"));
+    Assert.assertEquals(123E64, parsed.getRaw("toobig"));
+    Assert.assertEquals(123.456f, parsed.getFloatMetric("value"));
+    Assert.assertEquals(123456789000L, parsed.getRaw("long"));
+    Assert.assertEquals(1.23456791E11f, parsed.getFloatMetric("long"));
+    Assert.assertEquals(1412705931123L, parsed.getTimestampFromEpoch());
   }
+
 }
