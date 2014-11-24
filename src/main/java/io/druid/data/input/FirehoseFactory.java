@@ -19,6 +19,4 @@ public interface FirehoseFactory<T extends InputRowParser>
    */
   public Firehose connect(T parser) throws IOException, ParseException;
 
-  @Deprecated
-  public InputRowParser getParser();
 }

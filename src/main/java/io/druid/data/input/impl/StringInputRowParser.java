@@ -3,11 +3,8 @@ package io.druid.data.input.impl;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableList;
-import com.metamx.common.logger.Logger;
 import com.metamx.common.parsers.ParseException;
 import com.metamx.common.parsers.Parser;
-import com.metamx.common.parsers.ToLowerCaseParser;
 import io.druid.data.input.ByteBufferInputRowParser;
 import io.druid.data.input.InputRow;
 
@@ -15,15 +12,12 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
-import java.util.List;
 import java.util.Map;
 
 /**
  */
 public class StringInputRowParser implements ByteBufferInputRowParser
 {
-  private static final Logger log = new Logger(StringInputRowParser.class);
-
   private final ParseSpec parseSpec;
   private final MapInputRowParser mapParser;
   private final Parser<String, Object> parser;
@@ -32,34 +26,12 @@ public class StringInputRowParser implements ByteBufferInputRowParser
 
   @JsonCreator
   public StringInputRowParser(
-      @JsonProperty("parseSpec") ParseSpec parseSpec,
-      // Backwards compatible
-      @JsonProperty("timestampSpec") TimestampSpec timestampSpec,
-      @JsonProperty("data") final DataSpec dataSpec,
-      @JsonProperty("dimensions") List<String> dimensions,
-      @JsonProperty("dimensionExclusions") List<String> dimensionExclusions
+      @JsonProperty("parseSpec") ParseSpec parseSpec
   )
   {
-    if (parseSpec == null) {
-      if (dataSpec == null) {
-        this.parseSpec = new JSONParseSpec(
-            timestampSpec,
-            new DimensionsSpec(
-                dimensions,
-                dimensionExclusions,
-                ImmutableList.<SpatialDimensionSchema>of()
-            )
-        );
-      } else {
-        this.parseSpec = dataSpec.toParseSpec(timestampSpec, dimensionExclusions);
-      }
-      this.mapParser = new MapInputRowParser(this.parseSpec, null, null, null, null);
-      this.parser = new ToLowerCaseParser(this.parseSpec.makeParser());
-    } else {
-      this.parseSpec = parseSpec;
-      this.mapParser = new MapInputRowParser(parseSpec, null, null, null, null);
-      this.parser = new ToLowerCaseParser(parseSpec.makeParser());
-    }
+    this.parseSpec = parseSpec;
+    this.mapParser = new MapInputRowParser(parseSpec);
+    this.parser = parseSpec.makeParser();
   }
 
   @Override
@@ -78,7 +50,7 @@ public class StringInputRowParser implements ByteBufferInputRowParser
   @Override
   public StringInputRowParser withParseSpec(ParseSpec parseSpec)
   {
-    return new StringInputRowParser(parseSpec, null, null, null, null);
+    return new StringInputRowParser(parseSpec);
   }
 
   private Map<String, Object> buildStringKeyMap(ByteBuffer input)

@@ -6,6 +6,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
+import com.google.inject.ProvisionException;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import org.junit.Assert;
@@ -34,6 +35,8 @@ public class PolyBindTest
                   {
                     binder.bind(Properties.class).toInstance(props);
                     PolyBind.createChoice(binder, "billy", Key.get(Gogo.class), Key.get(GoA.class));
+                    PolyBind.createChoiceWithDefault(binder, "sally", Key.get(GogoSally.class), null, "b");
+
                   }
                 }
             ),
@@ -51,9 +54,13 @@ public class PolyBindTest
           @Override
           public void configure(Binder binder)
           {
-            final MapBinder<String,Gogo> gogoBinder = PolyBind.optionBinder(binder, Key.get(Gogo.class));
+            final MapBinder<String, Gogo> gogoBinder = PolyBind.optionBinder(binder, Key.get(Gogo.class));
             gogoBinder.addBinding("a").to(GoA.class);
             gogoBinder.addBinding("b").to(GoB.class);
+
+            final MapBinder<String, GogoSally> gogoSallyBinder = PolyBind.optionBinder(binder, Key.get(GogoSally.class));
+            gogoSallyBinder.addBinding("a").to(GoA.class);
+            gogoSallyBinder.addBinding("b").to(GoB.class);
 
             PolyBind.createChoice(
                 binder, "billy", Key.get(Gogo.class, Names.named("reverse")), Key.get(GoB.class)
@@ -82,6 +89,21 @@ public class PolyBindTest
     props.setProperty("billy", "c");
     Assert.assertEquals("A", injector.getInstance(Gogo.class).go());
     Assert.assertEquals("B", injector.getInstance(Key.get(Gogo.class, Names.named("reverse"))).go());
+
+    // test default property value
+    Assert.assertEquals("B", injector.getInstance(GogoSally.class).go());
+    props.setProperty("sally", "a");
+    Assert.assertEquals("A", injector.getInstance(GogoSally.class).go());
+    props.setProperty("sally", "b");
+    Assert.assertEquals("B", injector.getInstance(GogoSally.class).go());
+    props.setProperty("sally", "c");
+    try {
+      injector.getInstance(GogoSally.class).go();
+      Assert.fail(); // should never be reached
+    } catch(Exception e) {
+      Assert.assertTrue(e instanceof ProvisionException);
+      Assert.assertTrue(e.getMessage().contains("Unknown provider[c] of Key[type=io.druid.guice.PolyBindTest$GogoSally"));
+    }
   }
 
   public static interface Gogo
@@ -89,7 +111,12 @@ public class PolyBindTest
     public String go();
   }
 
-  public static class GoA implements Gogo
+  public static interface GogoSally
+  {
+    public String go();
+  }
+
+  public static class GoA implements Gogo, GogoSally
   {
     @Override
     public String go()
@@ -98,7 +125,7 @@ public class PolyBindTest
     }
   }
 
-  public static class GoB implements Gogo
+  public static class GoB implements Gogo, GogoSally
   {
     @Override
     public String go()

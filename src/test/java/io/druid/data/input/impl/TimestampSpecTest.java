@@ -32,7 +32,7 @@ public class TimestampSpecTest
     TimestampSpec spec = new TimestampSpec("TIMEstamp", "yyyy-MM-dd");
     Assert.assertEquals(
         new DateTime("2014-03-01"),
-        spec.extractTimestamp(ImmutableMap.<String, Object>of("timestamp", "2014-03-01"))
+        spec.extractTimestamp(ImmutableMap.<String, Object>of("TIMEstamp", "2014-03-01"))
     );
   }
 }
