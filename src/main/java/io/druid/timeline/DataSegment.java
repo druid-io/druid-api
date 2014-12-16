@@ -4,10 +4,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Interner;
+import com.google.common.collect.Interners;
 import com.google.common.collect.Iterables;
 import com.metamx.common.Granularity;
 import io.druid.jackson.CommaListJoinDeserializer;
@@ -28,6 +31,15 @@ public class DataSegment implements Comparable<DataSegment>
 {
   public static String delimiter = "_";
   private final Integer binaryVersion;
+  private static final Interner<String> interner = Interners.newWeakInterner();
+  private static final Function<String, String> internFun = new Function<String, String>()
+  {
+    @Override
+    public String apply(String input)
+    {
+      return interner.intern(input);
+    }
+  };
 
   public static String makeDataSegmentIdentifier(
       String dataSource,
@@ -83,16 +95,17 @@ public class DataSegment implements Comparable<DataSegment>
       }
     };
 
-    this.dataSource = dataSource;
+    // dataSource, dimensions & metrics are stored as canonical string values to decrease memory required for storing large numbers of segments.
+    this.dataSource = interner.intern(dataSource);
     this.interval = interval;
     this.loadSpec = loadSpec;
     this.version = version;
     this.dimensions = dimensions == null
                       ? ImmutableList.<String>of()
-                      : ImmutableList.copyOf(Iterables.filter(dimensions, nonEmpty));
+                      : ImmutableList.copyOf(Iterables.transform(Iterables.filter(dimensions, nonEmpty), internFun));
     this.metrics = metrics == null
                    ? ImmutableList.<String>of()
-                   : ImmutableList.copyOf(Iterables.filter(metrics, nonEmpty));
+                   : ImmutableList.copyOf(Iterables.transform(Iterables.filter(metrics, nonEmpty), internFun));
     this.shardSpec = (shardSpec == null) ? new NoneShardSpec() : shardSpec;
     this.binaryVersion = binaryVersion;
     this.size = size;
