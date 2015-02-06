@@ -37,6 +37,8 @@ public class DelimitedParseSpec extends ParseSpec
     for (String column : this.columns) {
       Preconditions.checkArgument(!column.contains(","), "Column[%s] has a comma, it cannot", column);
     }
+
+    verify(dimensionsSpec.getDimensions());
   }
 
   @JsonProperty("delimiter")

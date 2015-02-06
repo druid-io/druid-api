@@ -34,6 +34,8 @@ public class CSVParseSpec extends ParseSpec
     }
 
     this.columns = columns;
+
+    verify(dimensionsSpec.getDimensions());
   }
 
   @JsonProperty
