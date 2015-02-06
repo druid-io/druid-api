@@ -3,7 +3,6 @@ package io.druid.data.input.impl;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.google.common.collect.Sets;
 import com.metamx.common.parsers.Parser;
 
 import java.util.List;
@@ -14,7 +13,8 @@ import java.util.List;
 @JsonSubTypes(value = {
     @JsonSubTypes.Type(name = "json", value = JSONParseSpec.class),
     @JsonSubTypes.Type(name = "csv", value = CSVParseSpec.class),
-    @JsonSubTypes.Type(name = "tsv", value = DelimitedParseSpec.class)
+    @JsonSubTypes.Type(name = "tsv", value = DelimitedParseSpec.class),
+    @JsonSubTypes.Type(name = "jsonLowercase", value = JSONLowercaseParseSpec.class),
 })
 public abstract class ParseSpec
 {

@@ -2,11 +2,14 @@ package io.druid.data.input.impl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
+import com.metamx.common.parsers.ParserUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -35,13 +38,12 @@ public class DimensionsSpec
     this.dimensionExclusions = (dimensionExclusions == null)
                                ? Sets.<String>newHashSet()
                                : Sets.newHashSet(dimensionExclusions);
-    Preconditions.checkArgument(
-        Sets.intersection(this.dimensionExclusions, Sets.newHashSet(this.dimensions)).isEmpty(),
-        "dimensions and dimensions exclusions cannot overlap"
-    );
+
     this.spatialDimensions = (spatialDimensions == null)
                              ? Lists.<SpatialDimensionSchema>newArrayList()
                              : spatialDimensions;
+
+    verify();
   }
 
   @JsonProperty
@@ -84,5 +86,29 @@ public class DimensionsSpec
   public DimensionsSpec withSpatialDimensions(List<SpatialDimensionSchema> spatials)
   {
     return new DimensionsSpec(dimensions, ImmutableList.copyOf(dimensionExclusions), spatials);
+  }
+
+  private void verify()
+  {
+    Preconditions.checkArgument(
+        Sets.intersection(this.dimensionExclusions, Sets.newHashSet(this.dimensions)).isEmpty(),
+        "dimensions and dimensions exclusions cannot overlap"
+    );
+
+    ParserUtils.validateFields(dimensions);
+    ParserUtils.validateFields(dimensionExclusions);
+    ParserUtils.validateFields(
+        Iterables.transform(
+            spatialDimensions,
+            new Function<SpatialDimensionSchema, String>()
+            {
+              @Override
+              public String apply(SpatialDimensionSchema input)
+              {
+                return input.getDimName();
+              }
+            }
+        )
+    );
   }
 }
