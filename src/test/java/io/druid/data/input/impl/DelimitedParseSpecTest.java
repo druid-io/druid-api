@@ -73,4 +73,24 @@ public class DelimitedParseSpecTest
         Arrays.asList("a")
     );
   }
+
+  @Test
+  public void testDefaultColumnList(){
+    final DelimitedParseSpec spec = new DelimitedParseSpec(
+        new TimestampSpec(
+            "timestamp",
+            "auto"
+        ),
+        new DimensionsSpec(
+            Arrays.asList("a", "b"),
+            Lists.<String>newArrayList(),
+            Lists.<SpatialDimensionSchema>newArrayList()
+        ),
+        ",",
+        null,
+        // pass null columns, use default
+        null
+    );
+    Assert.assertEquals(spec.getColumns(), spec.getDimensionsSpec().getDimensions());
+  }
 }
