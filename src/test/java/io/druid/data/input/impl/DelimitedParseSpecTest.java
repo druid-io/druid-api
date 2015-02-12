@@ -6,6 +6,7 @@ import io.druid.TestObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.validation.constraints.Null;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -74,7 +75,7 @@ public class DelimitedParseSpecTest
     );
   }
 
-  @Test
+  @Test(expected = NullPointerException.class)
   public void testDefaultColumnList(){
     final DelimitedParseSpec spec = new DelimitedParseSpec(
         new TimestampSpec(
@@ -88,9 +89,8 @@ public class DelimitedParseSpecTest
         ),
         ",",
         null,
-        // pass null columns, use default
+        // pass null columns not allowed
         null
     );
-    Assert.assertEquals(spec.getColumns(), spec.getDimensionsSpec().getDimensions());
   }
 }
