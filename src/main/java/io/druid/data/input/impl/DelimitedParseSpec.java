@@ -32,8 +32,8 @@ public class DelimitedParseSpec extends ParseSpec
 
     this.delimiter = delimiter;
     this.listDelimiter = listDelimiter;
-
-    this.columns = columns == null ? dimensionsSpec.getDimensions() : columns;
+    Preconditions.checkNotNull(columns, "columns");
+    this.columns = columns;
     for (String column : this.columns) {
       Preconditions.checkArgument(!column.contains(","), "Column[%s] has a comma, it cannot", column);
     }
