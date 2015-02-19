@@ -103,7 +103,12 @@ public class MapBasedRow implements Row
       return ((Number) metricValue).floatValue();
     } else if (metricValue instanceof String) {
       try {
-        return Float.valueOf(((String) metricValue).replace(",", ""));
+          String value = (String)metricValue;
+          if(value.contains(",")){
+              return Float.valueOf(value.replaceAll(",", ""));
+          }else{
+              return Float.valueOf(value);
+          }
       }
       catch (Exception e) {
         throw new ParseException(e, "Unable to parse metrics[%s], value[%s]", metric, metricValue);
@@ -126,7 +131,12 @@ public class MapBasedRow implements Row
       return ((Number) metricValue).longValue();
     } else if (metricValue instanceof String) {
       try {
-        return Long.valueOf(((String) metricValue).replace(",", ""));
+          String value = (String)metricValue;
+          if(value.contains(",")){
+              return Long.valueOf(value.replaceAll(",", ""));
+          }else{
+              return Long.valueOf(value);
+          }
       }
       catch (Exception e) {
         throw new ParseException(e, "Unable to parse metrics[%s], value[%s]", metric, metricValue);
