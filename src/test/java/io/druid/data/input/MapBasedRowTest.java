@@ -37,7 +37,7 @@ public class MapBasedRowTest
     );
     Assert.assertEquals(-1, row.getLongMetric("k0"));
     Assert.assertEquals(1, row.getLongMetric("k1"));
-    Assert.assertEquals(2, row.getLongMetric("k2"));
+    Assert.assertEquals(1, row.getLongMetric("k2"));
     Assert.assertEquals(9223372036854775806L, row.getLongMetric("k3"));
     Assert.assertEquals(-9223372036854775807L, row.getLongMetric("k4"));
   }
