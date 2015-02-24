@@ -32,13 +32,23 @@ public class MapBasedRowTest
   {
     MapBasedRow row = new MapBasedRow(
         new DateTime(),
-        ImmutableMap.<String, Object>of(
-            "k0", "-1.2", "k1", "1.23", "k2", "1.8", "k3", "9223372036854775806", "k4", "-9223372036854775807")
+        ImmutableMap.<String,Object>builder()
+          .put("k0", "-1.2")
+          .put("k1", "1.23")
+          .put("k2", "1.8")
+          .put("k3", "1e5")
+          .put("k4", "9223372036854775806")
+          .put("k5", "-9223372036854775807")
+          .put("k6", "+9223372036854775802")
+          .build()
     );
+    
     Assert.assertEquals(-1, row.getLongMetric("k0"));
     Assert.assertEquals(1, row.getLongMetric("k1"));
     Assert.assertEquals(1, row.getLongMetric("k2"));
-    Assert.assertEquals(9223372036854775806L, row.getLongMetric("k3"));
-    Assert.assertEquals(-9223372036854775807L, row.getLongMetric("k4"));
+    Assert.assertEquals(100000, row.getLongMetric("k3"));
+    Assert.assertEquals(9223372036854775806L, row.getLongMetric("k4"));
+    Assert.assertEquals(-9223372036854775807L, row.getLongMetric("k5"));
+    Assert.assertEquals(9223372036854775802L, row.getLongMetric("k6"));
   }
 }

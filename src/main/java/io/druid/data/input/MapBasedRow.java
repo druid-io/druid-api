@@ -12,6 +12,7 @@ import org.joda.time.DateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  */
@@ -21,6 +22,8 @@ public class MapBasedRow implements Row
 
   private final DateTime timestamp;
   private final Map<String, Object> event;
+
+  private static final Pattern LONG_PAT = Pattern.compile("[-|+]?\\d+");
 
   @JsonCreator
   public MapBasedRow(
@@ -127,7 +130,7 @@ public class MapBasedRow implements Row
     } else if (metricValue instanceof String) {
       try {
         String s = ((String) metricValue).replace(",", "");
-        return s.contains(".") ? Double.valueOf(s).longValue() : Long.valueOf(s);
+        return LONG_PAT.matcher(s).matches() ? Long.valueOf(s) : Double.valueOf(s).longValue();
       }
       catch (Exception e) {
         throw new ParseException(e, "Unable to parse metrics[%s], value[%s]", metric, metricValue);
