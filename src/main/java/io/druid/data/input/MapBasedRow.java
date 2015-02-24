@@ -126,7 +126,8 @@ public class MapBasedRow implements Row
       return ((Number) metricValue).longValue();
     } else if (metricValue instanceof String) {
       try {
-        return Long.valueOf(((String) metricValue).replace(",", ""));
+        String s = ((String) metricValue).replace(",", "");
+        return s.contains(".") ? Math.round(Double.valueOf(s)) : Long.valueOf(s);
       }
       catch (Exception e) {
         throw new ParseException(e, "Unable to parse metrics[%s], value[%s]", metric, metricValue);
