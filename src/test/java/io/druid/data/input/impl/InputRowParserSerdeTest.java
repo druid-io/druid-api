@@ -23,7 +23,7 @@ public class InputRowParserSerdeTest
   {
     final StringInputRowParser parser = new StringInputRowParser(
         new JSONParseSpec(
-            new TimestampSpec("timestamp", "iso"),
+            new TimestampSpec("timestamp", "iso", null),
             new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null)
         )
     );
@@ -47,7 +47,7 @@ public class InputRowParserSerdeTest
   {
     final MapInputRowParser parser = new MapInputRowParser(
         new JSONParseSpec(
-            new TimestampSpec("timeposix", "posix"),
+            new TimestampSpec("timeposix", "posix", null),
             new DimensionsSpec(ImmutableList.of("foo", "bar"), ImmutableList.of("baz"), null)
         )
     );
@@ -74,7 +74,7 @@ public class InputRowParserSerdeTest
   {
     final MapInputRowParser parser = new MapInputRowParser(
         new JSONParseSpec(
-            new TimestampSpec("timemillis", "millis"),
+            new TimestampSpec("timemillis", "millis", null),
             new DimensionsSpec(ImmutableList.of("foo", "values"), ImmutableList.of("toobig", "value"), null)
         )
     );

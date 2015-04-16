@@ -14,7 +14,8 @@ public class ParseSpecTest
     final ParseSpec spec = new DelimitedParseSpec(
         new TimestampSpec(
             "timestamp",
-            "auto"
+            "auto",
+            null
         ),
         new DimensionsSpec(
             Arrays.asList("a", "b", "a"),
@@ -33,7 +34,8 @@ public class ParseSpecTest
     final ParseSpec spec = new DelimitedParseSpec(
         new TimestampSpec(
             "timestamp",
-            "auto"
+            "auto",
+            null
         ),
         new DimensionsSpec(
             Arrays.asList("a", "B"),
@@ -52,7 +54,8 @@ public class ParseSpecTest
     final ParseSpec spec = new DelimitedParseSpec(
         new TimestampSpec(
             "timestamp",
-            "auto"
+            "auto",
+            null
         ),
         new DimensionsSpec(
             Arrays.asList("a"),
