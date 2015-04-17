@@ -18,7 +18,7 @@ public class DelimitedParseSpecTest
   public void testSerde() throws IOException
   {
     DelimitedParseSpec spec = new DelimitedParseSpec(
-        new TimestampSpec("abc", "iso"),
+        new TimestampSpec("abc", "iso", null),
         new DimensionsSpec(Arrays.asList("abc"), null, null),
         "\u0001",
         "\u0002",
@@ -43,7 +43,8 @@ public class DelimitedParseSpecTest
     final ParseSpec spec = new DelimitedParseSpec(
         new TimestampSpec(
             "timestamp",
-            "auto"
+            "auto",
+            null
         ),
         new DimensionsSpec(
             Arrays.asList("a", "b"),
@@ -62,7 +63,8 @@ public class DelimitedParseSpecTest
     final ParseSpec spec = new DelimitedParseSpec(
         new TimestampSpec(
             "timestamp",
-            "auto"
+            "auto",
+            null
         ),
         new DimensionsSpec(
             Arrays.asList("a,", "b"),
@@ -80,7 +82,8 @@ public class DelimitedParseSpecTest
     final DelimitedParseSpec spec = new DelimitedParseSpec(
         new TimestampSpec(
             "timestamp",
-            "auto"
+            "auto",
+            null
         ),
         new DimensionsSpec(
             Arrays.asList("a", "b"),

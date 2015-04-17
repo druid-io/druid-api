@@ -17,7 +17,8 @@ public class JSONLowercaseParseSpecTest
     JSONLowercaseParseSpec spec = new JSONLowercaseParseSpec(
         new TimestampSpec(
             "timestamp",
-            "auto"
+            "auto",
+            null
         ),
         new DimensionsSpec(
             Arrays.asList("A", "B"),

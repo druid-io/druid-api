@@ -14,7 +14,8 @@ public class CSVParseSpecTest
     final ParseSpec spec = new CSVParseSpec(
         new TimestampSpec(
             "timestamp",
-            "auto"
+            "auto",
+            null
         ),
         new DimensionsSpec(
             Arrays.asList("a", "b"),
@@ -32,7 +33,8 @@ public class CSVParseSpecTest
     final ParseSpec spec = new CSVParseSpec(
         new TimestampSpec(
             "timestamp",
-            "auto"
+            "auto",
+            null
         ),
         new DimensionsSpec(
             Arrays.asList("a,", "b"),
