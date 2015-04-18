@@ -50,6 +50,12 @@ public class TimestampSpec
     return timestampFormat;
   }
 
+  @JsonProperty("missingValue")
+  public DateTime getMissingValue()
+  {
+    return missingValue;
+  }
+
   public DateTime extractTimestamp(Map<String, Object> input)
   {
     final Object o = input.get(timestampColumn);
