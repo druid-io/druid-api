@@ -26,7 +26,7 @@
     </parent>
 
     <artifactId>druid-api</artifactId>
-    <version>0.3.8-SNAPSHOT</version>
+    <version>0.3.8</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Druid Extensions API</description>
@@ -57,7 +57,7 @@
         <connection>scm:git:ssh://git@github.com/druid-io/druid-api.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/druid-io/druid-api.git</developerConnection>
         <url>https://github.com/druid-io/druid-api.git</url>
-        <tag>HEAD</tag>
+        <tag>druid-api-0.3.8</tag>
     </scm>
 
     <dependencies>
