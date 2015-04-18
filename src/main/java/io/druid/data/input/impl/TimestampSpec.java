@@ -14,7 +14,7 @@ public class TimestampSpec
 {
   private static final String DEFAULT_COLUMN = "timestamp";
   private static final String DEFAULT_FORMAT = "auto";
-  private static final DateTime MISSING_VALUE = null;
+  private static final DateTime DEFAULT_MISSING_VALUE = null;
 
   private final String timestampColumn;
   private final String timestampFormat;
@@ -34,7 +34,7 @@ public class TimestampSpec
     this.timestampFormat = format == null ? DEFAULT_FORMAT : format;
     this.timestampConverter = ParserUtils.createTimestampParser(timestampFormat);
     this.missingValue = missingValue == null
-                                       ? MISSING_VALUE
+                                       ? DEFAULT_MISSING_VALUE
                                        : missingValue;
   }
 
