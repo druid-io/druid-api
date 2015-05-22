@@ -1,5 +1,6 @@
 package io.druid.data.input;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ import java.util.List;
  * in all lowercase form (i.e. they should either have already turned everything into lowercase or they
  * should operate in a case-insensitive manner).
  */
-public interface InputRow extends Row
+public interface InputRow extends Row ,Serializable
 {
   /**
    * Returns the dimensions that exist in this row.
