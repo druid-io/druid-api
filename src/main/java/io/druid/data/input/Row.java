@@ -10,14 +10,6 @@ import java.util.List;
 /**
  * A Row of data.  This can be used for both input and output into various parts of the system.  It assumes
  * that the user already knows the schema of the row and can query for the parts that they care about.
- * <p/>
- * Note, Druid is a case-insensitive system for parts of schema (column names), this has direct implications
- * for the implementation of InputRows and Rows.  The case-insensitiveness is implemented by lowercasing all
- * schema elements before looking them up, this means that calls to getDimension() and getFloatMetric() will
- * have all lowercase column names passed in no matter what is returned from getDimensions or passed in as the
- * fieldName of an AggregatorFactory.  Implementations of InputRow and Row should expect to get values back
- * in all lowercase form (i.e. they should either have already turned everything into lowercase or they
- * should operate in a case-insensitive manner).
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "version", defaultImpl = MapBasedRow.class)
 @JsonSubTypes(value = {
@@ -44,9 +36,8 @@ public interface Row extends Comparable<Row>
   /**
    * Returns the list of dimension values for the given column name.
    * <p/>
-   * Column names are always all lowercase in order to support case-insensitive schemas.
    *
-   * @param dimension the lowercase column name of the dimension requested
+   * @param dimension the column name of the dimension requested
    *
    * @return the list of values for the provided column name
    */
@@ -56,7 +47,7 @@ public interface Row extends Comparable<Row>
    * Returns the raw dimension value for the given column name. This is different from #getDimension which
    * all values to strings before returning them.
    *
-   * @param dimension the lowercase column name of the dimension requested
+   * @param dimension the column name of the dimension requested
    *
    * @return the value of the provided column name
    */
@@ -65,9 +56,8 @@ public interface Row extends Comparable<Row>
   /**
    * Returns the float value of the given metric column.
    * <p/>
-   * Column names are always all lowercase in order to support case-insensitive schemas.
    *
-   * @param metric the lowercase column name of the metric requested
+   * @param metric the column name of the metric requested
    *
    * @return the float value for the provided column name.
    */
@@ -76,9 +66,8 @@ public interface Row extends Comparable<Row>
   /**
    * Returns the long value of the given metric column.
    * <p/>
-   * Column names are always all lowercase in order to support case-insensitive schemas.
    *
-   * @param metric the lowercase column name of the metric requested
+   * @param metric the column name of the metric requested
    *
    * @return the long value for the provided column name.
    */
