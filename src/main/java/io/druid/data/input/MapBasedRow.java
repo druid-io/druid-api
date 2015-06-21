@@ -67,6 +67,7 @@ public class MapBasedRow implements Row
     if (dimValue == null) {
       return Collections.emptyList();
     } else if (dimValue instanceof List) {
+      // guava's toString function fails on null objects, so please do not use it
       return Lists.transform((List<Object>) dimValue, TO_STRING_INCLUDING_NULL);
     } else {
       return Collections.singletonList(String.valueOf(dimValue));
@@ -168,7 +169,6 @@ public class MapBasedRow implements Row
     return timestamp.compareTo(o.getTimestamp());
   }
 
-  // guava's toString function checks on non-null objects, so do not use it
   private static final class ToStringFunction implements Function<Object, String>
   {
     @Override
