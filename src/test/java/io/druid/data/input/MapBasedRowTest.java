@@ -19,11 +19,16 @@
 
 package io.druid.data.input;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MapBasedRowTest
 {
@@ -51,4 +56,24 @@ public class MapBasedRowTest
     Assert.assertEquals(-9223372036854775807L, row.getLongMetric("k5"));
     Assert.assertEquals(9223372036854775802L, row.getLongMetric("k6"));
   }
+
+  @Test
+  public void testMapWithNull()
+  {
+    Map<String, Object> map = new HashMap<>();
+    map.put("k0", null);
+    map.put("k1", Collections.singletonList(null));
+    map.put("k2", Arrays.asList(null, null, null));
+    MapBasedRow row = new MapBasedRow(new DateTime(), map);
+
+    // A) if value is NULL, then an empty list is returned
+    // (actually, its if (!map.containsKey()), with java8
+    // one should use getOrDefault)
+    Assert.assertEquals(Collections.emptyList(), row.getDimension("k0"));
+
+    // B) if value is a list, then _any_ NULL value is transformed to string "null"
+    Assert.assertEquals(Collections.singletonList("null"), row.getDimension("k1"));
+    Assert.assertEquals(ImmutableList.of("null", "null", "null"), row.getDimension("k2"));
+  }
+
 }

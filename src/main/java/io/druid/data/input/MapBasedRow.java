@@ -4,12 +4,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import com.metamx.common.IAE;
 import com.metamx.common.logger.Logger;
 import com.metamx.common.parsers.ParseException;
 import org.joda.time.DateTime;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -19,11 +18,10 @@ import java.util.regex.Pattern;
 public class MapBasedRow implements Row
 {
   private static final Logger log = new Logger(MapBasedRow.class);
-
+  private static final Function<Object, String> TO_STRING_INCLUDING_NULL = new ToStringFunction();
+  private static final Pattern LONG_PAT = Pattern.compile("[-|+]?\\d+");
   private final DateTime timestamp;
   private final Map<String, Object> event;
-
-  private static final Pattern LONG_PAT = Pattern.compile("[-|+]?\\d+");
 
   @JsonCreator
   public MapBasedRow(
@@ -64,26 +62,14 @@ public class MapBasedRow implements Row
   @Override
   public List<String> getDimension(String dimension)
   {
-    Object dimValue = event.get(dimension);
+    final Object dimValue = event.get(dimension);
 
     if (dimValue == null) {
-      return Lists.newArrayList();
+      return Collections.emptyList();
     } else if (dimValue instanceof List) {
-      return Lists.transform(
-          (List) dimValue,
-          new Function<Object, String>()
-          {
-            @Override
-            public String apply(Object input)
-            {
-              return String.valueOf(input);
-            }
-          }
-      );
-    } else if (dimValue instanceof Object) {
-      return Arrays.asList(String.valueOf(event.get(dimension)));
+      return Lists.transform((List<Object>) dimValue, TO_STRING_INCLUDING_NULL);
     } else {
-      throw new IAE("Unknown dim type[%s]", dimValue.getClass());
+      return Collections.singletonList(String.valueOf(dimValue));
     }
   }
 
@@ -164,11 +150,8 @@ public class MapBasedRow implements Row
     if (!event.equals(that.event)) {
       return false;
     }
-    if (!timestamp.equals(that.timestamp)) {
-      return false;
-    }
+    return timestamp.equals(that.timestamp);
 
-    return true;
   }
 
   @Override
@@ -183,5 +166,15 @@ public class MapBasedRow implements Row
   public int compareTo(Row o)
   {
     return timestamp.compareTo(o.getTimestamp());
+  }
+
+  // guava's toString function checks on non-null objects, so do not use it
+  private static final class ToStringFunction implements Function<Object, String>
+  {
+    @Override
+    public String apply(final Object input)
+    {
+      return String.valueOf(input);
+    }
   }
 }
