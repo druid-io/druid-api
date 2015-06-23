@@ -10,6 +10,7 @@ import com.metamx.common.parsers.ParseException;
 import org.joda.time.DateTime;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -19,6 +20,13 @@ import java.util.regex.Pattern;
 public class MapBasedRow implements Row
 {
   private static final Logger log = new Logger(MapBasedRow.class);
+  private static final Function<Object, String> TO_STRING_INCLUDING_NULL = new Function<Object, String>() {
+    @Override
+    public String apply(final Object o)
+    {
+      return String.valueOf(o);
+    }
+  };
 
   private final DateTime timestamp;
   private final Map<String, Object> event;
@@ -64,26 +72,17 @@ public class MapBasedRow implements Row
   @Override
   public List<String> getDimension(String dimension)
   {
-    Object dimValue = event.get(dimension);
+    final Object dimValue = event.get(dimension);
 
     if (dimValue == null) {
-      return Lists.newArrayList();
+      return Collections.emptyList();
     } else if (dimValue instanceof List) {
+      // guava's toString function fails on null objects, so please do not use it
       return Lists.transform(
           (List) dimValue,
-          new Function<Object, String>()
-          {
-            @Override
-            public String apply(Object input)
-            {
-              return String.valueOf(input);
-            }
-          }
-      );
-    } else if (dimValue instanceof Object) {
-      return Arrays.asList(String.valueOf(event.get(dimension)));
+          TO_STRING_INCLUDING_NULL);
     } else {
-      throw new IAE("Unknown dim type[%s]", dimValue.getClass());
+      return Collections.singletonList(String.valueOf(dimValue));
     }
   }
 
