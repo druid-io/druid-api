@@ -32,8 +32,11 @@ import java.io.Closeable;
  * 1. Call start()
  * 2. Read currRow()
  * 3. Call advance()
- * 4. GOTO 2
+ * 4. If index should be committed: commit()
+ * 5. GOTO 2
  *
+ * Note that commit() is being called *after* advance.
+ * 
  * This object acts a lot like an Iterator, but it doesn't extend the Iterator interface because it extends
  * Closeable and it is very important that the close() method doesn't get forgotten, which is easy to do if this
  * gets passed around as an Iterator.
@@ -51,7 +54,10 @@ public interface FirehoseV2 extends Closeable
     void start() throws Exception;
 
     /**
-     * Advance the firehose to the next offset
+     * Advance the firehose to the next offset.  Implementations of this interface should make sure that
+     * if advance() is called and throws out an exception, the next call to currRow() should return a 
+     * null value.
+     * 
      * @return true if and when there is another row available, false if the stream has dried up
      */
     public boolean advance();
@@ -66,9 +72,12 @@ public interface FirehoseV2 extends Closeable
      *
      * This method is called when the main processing loop starts to persist its current batch of things to process.
      * The returned committer will be run when the current batch has been successfully persisted
-     * and the metadata committer carries can also be persisted along with segment data. There is usually
+     * and the metadata the committer carries can also be persisted along with segment data. There is usually
      * some time lag between when this method is called and when the runnable is run.  The Runnable is also run on
      * a separate thread so its operation should be thread-safe.
+     * 
+     * Note that "correct" usage of this interface will always call advance() before commit() if the current row
+     * is considered in the commit.
      *
      * The Runnable is essentially just a lambda/closure that is run() after data supplied by this instance has
      * been committed on the writer side of this interface protocol.
