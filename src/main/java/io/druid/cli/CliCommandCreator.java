@@ -19,7 +19,7 @@
 
 package io.druid.cli;
 
-import io.airlift.command.Cli;
+import io.airlift.airline.Cli;
 
 /**
  */
