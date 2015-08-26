@@ -29,6 +29,10 @@ public class DataSegmentPusherUtil
 {
   private static final Joiner JOINER = Joiner.on("/").skipNulls();
 
+  // Note: storage directory structure format = .../dataSource/interval/version/partitionNumber/
+  // If above format is ever changed, make sure to change it appropriately in other places
+  // e.g. HDFSDataSegmentKiller uses this information to clean the version, interval and dataSource directories
+  // on segment deletion if segment being deleted was the only segment
   public static String getStorageDir(DataSegment segment)
   {
     return JOINER.join(
