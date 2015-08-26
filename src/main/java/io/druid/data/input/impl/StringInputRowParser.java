@@ -27,6 +27,7 @@ import io.druid.data.input.InputRow;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 import java.util.Map;
@@ -38,17 +39,32 @@ public class StringInputRowParser implements ByteBufferInputRowParser
   private final ParseSpec parseSpec;
   private final MapInputRowParser mapParser;
   private final Parser<String, Object> parser;
+  private final String encoding;
 
   private CharBuffer chars = null;
 
   @JsonCreator
   public StringInputRowParser(
-      @JsonProperty("parseSpec") ParseSpec parseSpec
+      @JsonProperty("parseSpec") ParseSpec parseSpec,
+      @JsonProperty("encoding") String encoding
   )
   {
     this.parseSpec = parseSpec;
     this.mapParser = new MapInputRowParser(parseSpec);
     this.parser = parseSpec.makeParser();
+    if(encoding != null) {
+      this.encoding = encoding;
+    } else {
+      this.encoding = Charsets.UTF_8.name();
+    }
+  }
+
+  public StringInputRowParser(ParseSpec parseSpec)
+  {
+    this.parseSpec = parseSpec;
+    this.mapParser = new MapInputRowParser(parseSpec);
+    this.parser = parseSpec.makeParser();
+    this.encoding = Charsets.UTF_8.name();
   }
 
   @Override
@@ -64,10 +80,16 @@ public class StringInputRowParser implements ByteBufferInputRowParser
     return parseSpec;
   }
 
+  @JsonProperty
+  public String getEncoding()
+  {
+    return encoding;
+  }
+
   @Override
   public StringInputRowParser withParseSpec(ParseSpec parseSpec)
   {
-    return new StringInputRowParser(parseSpec);
+    return new StringInputRowParser(parseSpec, encoding);
   }
 
   private Map<String, Object> buildStringKeyMap(ByteBuffer input)
@@ -78,10 +100,12 @@ public class StringInputRowParser implements ByteBufferInputRowParser
       chars = CharBuffer.allocate(payloadSize);
     }
 
-    final CoderResult coderResult = Charsets.UTF_8.newDecoder()
-                                                  .onMalformedInput(CodingErrorAction.REPLACE)
-                                                  .onUnmappableCharacter(CodingErrorAction.REPLACE)
-                                                  .decode(input, chars, true);
+    Charset charset = Charset.forName(encoding);
+    final CoderResult coderResult = charset.newDecoder()
+                                           .onMalformedInput(CodingErrorAction.REPLACE)
+                                           .onUnmappableCharacter(CodingErrorAction.REPLACE)
+                                           .decode(input, chars, true);
+
 
     Map<String, Object> theMap;
     if (coderResult.isUnderflow()) {
