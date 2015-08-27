@@ -61,7 +61,8 @@
     </scm>
 
     <properties>
-        <jackson.version>2.6.1</jackson.version>
+        <!-- make sure to update jackson in main druid pom as well -->
+        <jackson.version>2.4.6</jackson.version>
     </properties>
 
     <dependencies>
