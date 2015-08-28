@@ -32,6 +32,7 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 
 public class InputRowParserSerdeTest
 {
@@ -59,6 +60,23 @@ public class InputRowParserSerdeTest
     Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension("foo"));
     Assert.assertEquals(ImmutableList.of("y"), parsed.getDimension("bar"));
     Assert.assertEquals(new DateTime("2000").getMillis(), parsed.getTimestampFromEpoch());
+  }
+
+  @Test
+  public void testStringInputRowParserSerdeMultiCharset() throws Exception
+  {
+    Charset[] testCharsets = {
+        Charsets.US_ASCII, Charsets.ISO_8859_1, Charsets.UTF_8,
+        Charsets.UTF_16BE, Charsets.UTF_16LE, Charsets.UTF_16
+    };
+
+    for (Charset testCharset : testCharsets) {
+      InputRow parsed = testCharsetParseHelper(testCharset);
+      Assert.assertEquals(ImmutableList.of("bar", "foo"), parsed.getDimensions());
+      Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension("foo"));
+      Assert.assertEquals(ImmutableList.of("y"), parsed.getDimension("bar"));
+      Assert.assertEquals(new DateTime("3000").getMillis(), parsed.getTimestampFromEpoch());
+    }
   }
 
   @Test
@@ -112,13 +130,40 @@ public class InputRowParserSerdeTest
     );
     Assert.assertEquals(ImmutableList.of("foo", "values"), parsed.getDimensions());
     Assert.assertEquals(ImmutableList.of(), parsed.getDimension("foo"));
-    Assert.assertEquals(ImmutableList.of("1412705931123", "123.456", "1.23E47", "hello"), parsed.getDimension("values"));
+    Assert.assertEquals(
+        ImmutableList.of("1412705931123", "123.456", "1.23E47", "hello"),
+        parsed.getDimension("values")
+    );
     Assert.assertEquals(Float.POSITIVE_INFINITY, parsed.getFloatMetric("toobig"));
     Assert.assertEquals(123E64, parsed.getRaw("toobig"));
     Assert.assertEquals(123.456f, parsed.getFloatMetric("value"));
     Assert.assertEquals(123456789000L, parsed.getRaw("long"));
     Assert.assertEquals(1.23456791E11f, parsed.getFloatMetric("long"));
     Assert.assertEquals(1412705931123L, parsed.getTimestampFromEpoch());
+  }
+
+  private InputRow testCharsetParseHelper(Charset charset) throws Exception
+  {
+    final StringInputRowParser parser = new StringInputRowParser(
+        new JSONParseSpec(
+            new TimestampSpec("timestamp", "iso", null),
+            new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null)
+        ),
+        charset.name()
+    );
+
+    final ByteBufferInputRowParser parser2 = jsonMapper.readValue(
+        jsonMapper.writeValueAsBytes(parser),
+        ByteBufferInputRowParser.class
+    );
+
+    final InputRow parsed = parser2.parse(
+        ByteBuffer.wrap(
+            "{\"foo\":\"x\",\"bar\":\"y\",\"qux\":\"z\",\"timestamp\":\"3000\"}".getBytes(charset)
+        )
+    );
+
+    return parsed;
   }
 
 }
