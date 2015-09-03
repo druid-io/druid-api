@@ -25,7 +25,8 @@ import io.druid.data.input.InputRow;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", defaultImpl = StringInputRowParser.class)
 @JsonSubTypes(value = {
     @JsonSubTypes.Type(name = "string", value = StringInputRowParser.class),
-    @JsonSubTypes.Type(name = "map", value = MapInputRowParser.class)
+    @JsonSubTypes.Type(name = "map", value = MapInputRowParser.class),
+    @JsonSubTypes.Type(name = "noop", value = NoopInputRowParser.class)
 })
 public interface InputRowParser<T>
 {

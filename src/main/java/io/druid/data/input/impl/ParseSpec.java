@@ -32,6 +32,7 @@ import java.util.List;
     @JsonSubTypes.Type(name = "csv", value = CSVParseSpec.class),
     @JsonSubTypes.Type(name = "tsv", value = DelimitedParseSpec.class),
     @JsonSubTypes.Type(name = "jsonLowercase", value = JSONLowercaseParseSpec.class),
+    @JsonSubTypes.Type(name = "timeAndDims", value = TimeAndDimsParseSpec.class)
 })
 public abstract class ParseSpec
 {
@@ -74,5 +75,34 @@ public abstract class ParseSpec
   public ParseSpec withDimensionsSpec(DimensionsSpec spec)
   {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public boolean equals(Object o)
+  {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    ParseSpec parseSpec = (ParseSpec) o;
+
+    if (timestampSpec != null ? !timestampSpec.equals(parseSpec.timestampSpec) : parseSpec.timestampSpec != null) {
+      return false;
+    }
+    return !(dimensionsSpec != null
+             ? !dimensionsSpec.equals(parseSpec.dimensionsSpec)
+             : parseSpec.dimensionsSpec != null);
+
+  }
+
+  @Override
+  public int hashCode()
+  {
+    int result = timestampSpec != null ? timestampSpec.hashCode() : 0;
+    result = 31 * result + (dimensionsSpec != null ? dimensionsSpec.hashCode() : 0);
+    return result;
   }
 }

@@ -128,4 +128,35 @@ public class DimensionsSpec
         )
     );
   }
+
+  @Override
+  public boolean equals(Object o)
+  {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    DimensionsSpec that = (DimensionsSpec) o;
+
+    if (!dimensions.equals(that.dimensions)) {
+      return false;
+    }
+    if (!dimensionExclusions.equals(that.dimensionExclusions)) {
+      return false;
+    }
+    return spatialDimensions.equals(that.spatialDimensions);
+
+  }
+
+  @Override
+  public int hashCode()
+  {
+    int result = dimensions.hashCode();
+    result = 31 * result + dimensionExclusions.hashCode();
+    result = 31 * result + spatialDimensions.hashCode();
+    return result;
+  }
 }

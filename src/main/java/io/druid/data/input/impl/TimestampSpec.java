@@ -79,4 +79,35 @@ public class TimestampSpec
 
     return o == null ? missingValue : timestampConverter.apply(o.toString());
   }
+
+  @Override
+  public boolean equals(Object o)
+  {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    TimestampSpec that = (TimestampSpec) o;
+
+    if (!timestampColumn.equals(that.timestampColumn)) {
+      return false;
+    }
+    if (!timestampFormat.equals(that.timestampFormat)) {
+      return false;
+    }
+    return !(missingValue != null ? !missingValue.equals(that.missingValue) : that.missingValue != null);
+
+  }
+
+  @Override
+  public int hashCode()
+  {
+    int result = timestampColumn.hashCode();
+    result = 31 * result + timestampFormat.hashCode();
+    result = 31 * result + (missingValue != null ? missingValue.hashCode() : 0);
+    return result;
+  }
 }
