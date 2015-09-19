@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Function;
 import com.metamx.common.parsers.ParserUtils;
+import com.metamx.common.parsers.TimestampParser;
 import org.joda.time.DateTime;
 
 import java.util.Map;
@@ -35,7 +36,7 @@ public class TimestampSpec
 
   private final String timestampColumn;
   private final String timestampFormat;
-  private final Function<String, DateTime> timestampConverter;
+  private final Function<Object, DateTime> timestampConverter;
   // this value should never be set for production data
   private final DateTime missingValue;
 
@@ -49,7 +50,7 @@ public class TimestampSpec
   {
     this.timestampColumn = (timestampColumn == null) ? DEFAULT_COLUMN : timestampColumn;
     this.timestampFormat = format == null ? DEFAULT_FORMAT : format;
-    this.timestampConverter = ParserUtils.createTimestampParser(timestampFormat);
+    this.timestampConverter = TimestampParser.createObjectTimestampParser(timestampFormat);
     this.missingValue = missingValue == null
                                        ? DEFAULT_MISSING_VALUE
                                        : missingValue;
@@ -77,7 +78,7 @@ public class TimestampSpec
   {
     final Object o = input.get(timestampColumn);
 
-    return o == null ? missingValue : timestampConverter.apply(o.toString());
+    return o == null ? missingValue : timestampConverter.apply(o);
   }
 
   @Override
