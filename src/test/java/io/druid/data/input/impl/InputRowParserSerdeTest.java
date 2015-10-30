@@ -44,7 +44,8 @@ public class InputRowParserSerdeTest
     final StringInputRowParser parser = new StringInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timestamp", "iso", null),
-            new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null)
+            new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null),
+            null
         )
     );
     final ByteBufferInputRowParser parser2 = jsonMapper.readValue(
@@ -85,7 +86,8 @@ public class InputRowParserSerdeTest
     final MapInputRowParser parser = new MapInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timeposix", "posix", null),
-            new DimensionsSpec(ImmutableList.of("foo", "bar"), ImmutableList.of("baz"), null)
+            new DimensionsSpec(ImmutableList.of("foo", "bar"), ImmutableList.of("baz"), null),
+            null
         )
     );
     final MapInputRowParser parser2 = jsonMapper.readValue(
@@ -112,7 +114,8 @@ public class InputRowParserSerdeTest
     final MapInputRowParser parser = new MapInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timemillis", "millis", null),
-            new DimensionsSpec(ImmutableList.of("foo", "values"), ImmutableList.of("toobig", "value"), null)
+            new DimensionsSpec(ImmutableList.of("foo", "values"), ImmutableList.of("toobig", "value"), null),
+            null
         )
     );
     final MapInputRowParser parser2 = jsonMapper.readValue(
@@ -147,7 +150,8 @@ public class InputRowParserSerdeTest
     final StringInputRowParser parser = new StringInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timestamp", "iso", null),
-            new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null)
+            new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null),
+            null
         ),
         charset.name()
     );
@@ -164,6 +168,38 @@ public class InputRowParserSerdeTest
     );
 
     return parsed;
+  }
+
+  @Test
+  public void testFlattenParse() throws Exception
+  {
+    ParseFlattenSpec flattenSpec = new ParseFlattenSpec(true, "$", ImmutableList.of("$met.a"));
+    final StringInputRowParser parser = new StringInputRowParser(
+        new JSONParseSpec(
+            new TimestampSpec("timestamp", "iso", null),
+            new DimensionsSpec(ImmutableList.of("$foo.bar1", "$foo.bar2", "$baz[0]","$baz[1]","$baz[2]", "foo.bar1", "$hey[0].barx"), null, null),
+            flattenSpec
+        )
+    );
+
+    final StringInputRowParser parser2 = jsonMapper.readValue(
+        jsonMapper.writeValueAsBytes(parser),
+        StringInputRowParser.class
+    );
+
+    final InputRow parsed = parser2.parse(
+        "{\"foo\":{\"bar1\":\"aaa\", \"bar2\":\"bbb\"}, \"baz\":[1,2,3], \"timestamp\":\"2999\", \"foo.bar1\":\"Hello world!\", \"hey\":[{\"barx\":\"asdf\"}], \"met\":{\"a\":456}}"
+    );
+    Assert.assertEquals(ImmutableList.of("$baz[0]","$baz[1]","$baz[2]", "$foo.bar1", "$foo.bar2", "$hey[0].barx", "foo.bar1"), parsed.getDimensions());
+    Assert.assertEquals(ImmutableList.of("aaa"), parsed.getDimension("$foo.bar1"));
+    Assert.assertEquals(ImmutableList.of("bbb"), parsed.getDimension("$foo.bar2"));
+    Assert.assertEquals(ImmutableList.of("1"), parsed.getDimension("$baz[0]"));
+    Assert.assertEquals(ImmutableList.of("2"), parsed.getDimension("$baz[1]"));
+    Assert.assertEquals(ImmutableList.of("3"), parsed.getDimension("$baz[2]"));
+    Assert.assertEquals(ImmutableList.of("Hello world!"), parsed.getDimension("foo.bar1"));
+    Assert.assertEquals(ImmutableList.of("asdf"), parsed.getDimension("$hey[0].barx"));
+    Assert.assertEquals(ImmutableList.of("456"), parsed.getDimension("$met.a"));
+    Assert.assertEquals(new DateTime("2999").getMillis(), parsed.getTimestampFromEpoch());
   }
 
 }
