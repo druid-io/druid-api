@@ -71,6 +71,12 @@ public class NoneShardSpec implements ShardSpec
   }
 
   @Override
+  public int hashCode()
+  {
+    return 0;
+  }
+
+  @Override
   public String toString()
   {
     return "NoneShardSpec";
