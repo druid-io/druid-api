@@ -30,15 +30,23 @@ import java.util.List;
 public class JSONParseSpec extends ParseSpec
 {
   private final ObjectMapper objectMapper;
+  private final ParseFlattenSpec flattenSpec;
 
   @JsonCreator
   public JSONParseSpec(
       @JsonProperty("timestampSpec") TimestampSpec timestampSpec,
-      @JsonProperty("dimensionsSpec") DimensionsSpec dimensionsSpec
+      @JsonProperty("dimensionsSpec") DimensionsSpec dimensionsSpec,
+      @JsonProperty("flattenSpec") ParseFlattenSpec flattenSpec
   )
   {
     super(timestampSpec, dimensionsSpec);
     this.objectMapper = new ObjectMapper();
+    this.flattenSpec = flattenSpec == null ? new ParseFlattenSpec(false, null, null) : flattenSpec;
+  }
+
+  @Deprecated
+  public JSONParseSpec(TimestampSpec ts, DimensionsSpec dims) {
+    this(ts, dims, null);
   }
 
   @Override
@@ -49,18 +57,32 @@ public class JSONParseSpec extends ParseSpec
   @Override
   public Parser<String, Object> makeParser()
   {
-    return new JSONParser(objectMapper, null);
+    if(flattenSpec.isEnabled()) {
+      return new JSONFlattenParser(objectMapper,
+                                   getDimensionsSpec().getDimensions(),
+                                   getTimestampSpec().getTimestampColumn(),
+                                   flattenSpec,
+                                   null);
+    } else {
+      return new JSONParser(objectMapper, null);
+    }
   }
 
   @Override
   public ParseSpec withTimestampSpec(TimestampSpec spec)
   {
-    return new JSONParseSpec(spec, getDimensionsSpec());
+    return new JSONParseSpec(spec, getDimensionsSpec(), flattenSpec);
   }
 
   @Override
   public ParseSpec withDimensionsSpec(DimensionsSpec spec)
   {
-    return new JSONParseSpec(getTimestampSpec(), spec);
+    return new JSONParseSpec(getTimestampSpec(), spec, flattenSpec);
+  }
+
+  @JsonProperty
+  public ParseFlattenSpec getFlattenSpec()
+  {
+    return flattenSpec;
   }
 }
