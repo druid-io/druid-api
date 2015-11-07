@@ -32,7 +32,10 @@ import java.util.List;
     @JsonSubTypes.Type(name = "csv", value = CSVParseSpec.class),
     @JsonSubTypes.Type(name = "tsv", value = DelimitedParseSpec.class),
     @JsonSubTypes.Type(name = "jsonLowercase", value = JSONLowercaseParseSpec.class),
-    @JsonSubTypes.Type(name = "timeAndDims", value = TimeAndDimsParseSpec.class)
+    @JsonSubTypes.Type(name = "timeAndDims", value = TimeAndDimsParseSpec.class),
+    @JsonSubTypes.Type(name = "regex", value = RegexParseSpec.class),
+    @JsonSubTypes.Type(name = "javascript", value = JavaScriptParseSpec.class)
+
 })
 public abstract class ParseSpec
 {
