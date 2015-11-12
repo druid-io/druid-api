@@ -17,13 +17,14 @@
 
 package io.druid.data.input.impl;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metamx.common.parsers.JSONParser;
 import com.metamx.common.parsers.Parser;
-
-import java.util.List;
 
 /**
  */
@@ -39,6 +40,7 @@ public class JSONParseSpec extends ParseSpec
   {
     super(timestampSpec, dimensionsSpec);
     this.objectMapper = new ObjectMapper();
+    objectMapper.configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
   }
 
   @Override
