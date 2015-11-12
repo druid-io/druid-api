@@ -23,6 +23,7 @@ import com.google.inject.Binder;
 import com.google.inject.Key;
 import com.google.inject.multibindings.MapBinder;
 import io.druid.segment.loading.DataSegmentArchiver;
+import io.druid.segment.loading.DataSegmentFinder;
 import io.druid.segment.loading.DataSegmentMover;
 import io.druid.segment.loading.DataSegmentKiller;
 import io.druid.segment.loading.DataSegmentPuller;
@@ -56,6 +57,11 @@ public class Binders
   public static MapBinder<String, DataSegmentPusher> dataSegmentPusherBinder(Binder binder)
   {
     return PolyBind.optionBinder(binder, Key.get(DataSegmentPusher.class));
+  }
+
+  public static MapBinder<String, DataSegmentFinder> dataSegmentFinderBinder(Binder binder)
+  {
+    return PolyBind.optionBinder(binder, Key.get(DataSegmentFinder.class));
   }
 
   public static MapBinder<String, TaskLogs> taskLogsBinder(Binder binder)
