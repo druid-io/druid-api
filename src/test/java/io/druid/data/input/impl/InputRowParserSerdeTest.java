@@ -56,7 +56,7 @@ public class InputRowParserSerdeTest
             "{\"foo\":\"x\",\"bar\":\"y\",\"qux\":\"z\",\"timestamp\":\"2000\"}".getBytes(Charsets.UTF_8)
         )
     );
-    Assert.assertEquals(ImmutableList.of("bar", "foo"), parsed.getDimensions());
+    Assert.assertEquals(ImmutableList.of("foo", "bar"), parsed.getDimensions());
     Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension("foo"));
     Assert.assertEquals(ImmutableList.of("y"), parsed.getDimension("bar"));
     Assert.assertEquals(new DateTime("2000").getMillis(), parsed.getTimestampFromEpoch());
@@ -72,7 +72,7 @@ public class InputRowParserSerdeTest
 
     for (Charset testCharset : testCharsets) {
       InputRow parsed = testCharsetParseHelper(testCharset);
-      Assert.assertEquals(ImmutableList.of("bar", "foo"), parsed.getDimensions());
+      Assert.assertEquals(ImmutableList.of("foo", "bar"), parsed.getDimensions());
       Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension("foo"));
       Assert.assertEquals(ImmutableList.of("y"), parsed.getDimension("bar"));
       Assert.assertEquals(new DateTime("3000").getMillis(), parsed.getTimestampFromEpoch());
@@ -100,7 +100,7 @@ public class InputRowParserSerdeTest
             "timeposix", "1"
         )
     );
-    Assert.assertEquals(ImmutableList.of("bar", "foo"), parsed.getDimensions());
+    Assert.assertEquals(ImmutableList.of("foo", "bar"), parsed.getDimensions());
     Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension("foo"));
     Assert.assertEquals(ImmutableList.of("y"), parsed.getDimension("bar"));
     Assert.assertEquals(1000, parsed.getTimestampFromEpoch());

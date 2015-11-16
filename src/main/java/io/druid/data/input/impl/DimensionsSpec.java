@@ -49,9 +49,6 @@ public class DimensionsSpec
                       ? Lists.<String>newArrayList()
                       : Lists.newArrayList(dimensions);
 
-    // Small work around for https://github.com/metamx/druid/issues/658
-    Collections.sort(this.dimensions, Ordering.natural().nullsFirst());
-
     this.dimensionExclusions = (dimensionExclusions == null)
                                ? Sets.<String>newHashSet()
                                : Sets.newHashSet(dimensionExclusions);
