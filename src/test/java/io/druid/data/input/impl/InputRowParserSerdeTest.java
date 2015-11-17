@@ -33,6 +33,8 @@ import org.junit.Test;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InputRowParserSerdeTest
 {
@@ -44,7 +46,8 @@ public class InputRowParserSerdeTest
     final StringInputRowParser parser = new StringInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timestamp", "iso", null),
-            new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null)
+            new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null),
+            null
         )
     );
     final ByteBufferInputRowParser parser2 = jsonMapper.readValue(
@@ -85,7 +88,8 @@ public class InputRowParserSerdeTest
     final MapInputRowParser parser = new MapInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timeposix", "posix", null),
-            new DimensionsSpec(ImmutableList.of("foo", "bar"), ImmutableList.of("baz"), null)
+            new DimensionsSpec(ImmutableList.of("foo", "bar"), ImmutableList.of("baz"), null),
+            null
         )
     );
     final MapInputRowParser parser2 = jsonMapper.readValue(
@@ -112,7 +116,8 @@ public class InputRowParserSerdeTest
     final MapInputRowParser parser = new MapInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timemillis", "millis", null),
-            new DimensionsSpec(ImmutableList.of("foo", "values"), ImmutableList.of("toobig", "value"), null)
+            new DimensionsSpec(ImmutableList.of("foo", "values"), ImmutableList.of("toobig", "value"), null),
+            null
         )
     );
     final MapInputRowParser parser2 = jsonMapper.readValue(
@@ -147,7 +152,8 @@ public class InputRowParserSerdeTest
     final StringInputRowParser parser = new StringInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timestamp", "iso", null),
-            new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null)
+            new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null),
+            null
         ),
         charset.name()
     );
@@ -164,6 +170,57 @@ public class InputRowParserSerdeTest
     );
 
     return parsed;
+  }
+
+  @Test
+  public void testFlattenParse() throws Exception
+  {
+    List<JSONPathFieldSpec> fields = new ArrayList<>();
+    fields.add(JSONPathFieldSpec.createNestedField("foobar1", "$.foo.bar1"));
+    fields.add(JSONPathFieldSpec.createNestedField("foobar2", "$.foo.bar2"));
+    fields.add(JSONPathFieldSpec.createNestedField("baz0", "$.baz[0]"));
+    fields.add(JSONPathFieldSpec.createNestedField("baz1", "$.baz[1]"));
+    fields.add(JSONPathFieldSpec.createNestedField("baz2", "$.baz[2]"));
+    fields.add(JSONPathFieldSpec.createNestedField("hey0barx", "$.hey[0].barx"));
+    fields.add(JSONPathFieldSpec.createNestedField("metA", "$.met.a"));
+    fields.add(JSONPathFieldSpec.createRootField("timestamp"));
+    fields.add(JSONPathFieldSpec.createRootField("foo.bar1"));
+
+    JSONPathSpec flattenSpec = new JSONPathSpec(true, fields);
+    final StringInputRowParser parser = new StringInputRowParser(
+        new JSONParseSpec(
+            new TimestampSpec("timestamp", "iso", null),
+            new DimensionsSpec(null, null, null),
+            flattenSpec
+        )
+    );
+
+    final StringInputRowParser parser2 = jsonMapper.readValue(
+        jsonMapper.writeValueAsBytes(parser),
+        StringInputRowParser.class
+    );
+
+    final InputRow parsed = parser2.parse(
+        "{\"blah\":[4,5,6], \"newmet\":5, \"foo\":{\"bar1\":\"aaa\", \"bar2\":\"bbb\"}, \"baz\":[1,2,3], \"timestamp\":\"2999\", \"foo.bar1\":\"Hello world!\", \"hey\":[{\"barx\":\"asdf\"}], \"met\":{\"a\":456}}"
+    );
+    Assert.assertEquals(ImmutableList.of("foobar1", "foobar2", "baz0", "baz1", "baz2", "hey0barx", "metA", "timestamp", "foo.bar1", "blah", "newmet", "baz"), parsed.getDimensions());
+    Assert.assertEquals(ImmutableList.of("aaa"), parsed.getDimension("foobar1"));
+    Assert.assertEquals(ImmutableList.of("bbb"), parsed.getDimension("foobar2"));
+    Assert.assertEquals(ImmutableList.of("1"), parsed.getDimension("baz0"));
+    Assert.assertEquals(ImmutableList.of("2"), parsed.getDimension("baz1"));
+    Assert.assertEquals(ImmutableList.of("3"), parsed.getDimension("baz2"));
+    Assert.assertEquals(ImmutableList.of("Hello world!"), parsed.getDimension("foo.bar1"));
+    Assert.assertEquals(ImmutableList.of("asdf"), parsed.getDimension("hey0barx"));
+    Assert.assertEquals(ImmutableList.of("456"), parsed.getDimension("metA"));
+    Assert.assertEquals(ImmutableList.of("5"), parsed.getDimension("newmet"));
+    Assert.assertEquals(new DateTime("2999").getMillis(), parsed.getTimestampFromEpoch());
+
+    String testSpec = "{\"enabled\": true,\"useFieldDiscovery\": true, \"fields\": [\"parseThisRootField\"]}";
+    final JSONPathSpec parsedSpec = jsonMapper.readValue(testSpec, JSONPathSpec.class);
+    List<JSONPathFieldSpec> fieldSpecs = parsedSpec.getFields();
+    Assert.assertEquals(JSONPathFieldType.ROOT, fieldSpecs.get(0).getType());
+    Assert.assertEquals("parseThisRootField", fieldSpecs.get(0).getName());
+    Assert.assertEquals("parseThisRootField", fieldSpecs.get(0).getExpr());
   }
 
 }
