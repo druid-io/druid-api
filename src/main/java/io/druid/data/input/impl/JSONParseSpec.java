@@ -19,12 +19,15 @@ package io.druid.data.input.impl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metamx.common.parsers.JSONPathParser;
 import com.metamx.common.parsers.Parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -32,23 +35,30 @@ public class JSONParseSpec extends ParseSpec
 {
   private final ObjectMapper objectMapper;
   private final JSONPathSpec flattenSpec;
+  private final Map<String, Boolean> featureSpec;
 
   @JsonCreator
   public JSONParseSpec(
       @JsonProperty("timestampSpec") TimestampSpec timestampSpec,
       @JsonProperty("dimensionsSpec") DimensionsSpec dimensionsSpec,
-      @JsonProperty("flattenSpec") JSONPathSpec flattenSpec
+      @JsonProperty("flattenSpec") JSONPathSpec flattenSpec,
+      @JsonProperty("featureSpec") Map<String, Boolean> featureSpec
   )
   {
     super(timestampSpec, dimensionsSpec);
     this.objectMapper = new ObjectMapper();
     this.flattenSpec = flattenSpec != null ? flattenSpec : new JSONPathSpec(true, null);
+    this.featureSpec = (featureSpec == null) ? new HashMap<String, Boolean>() : featureSpec;
+    for (Map.Entry<String, Boolean> entry : this.featureSpec.entrySet()) {
+      Feature feature = Feature.valueOf(entry.getKey());
+      objectMapper.configure(feature, entry.getValue());
+    }
   }
 
   @Deprecated
   public JSONParseSpec(TimestampSpec ts, DimensionsSpec dims)
   {
-    this(ts, dims, null);
+    this(ts, dims, null, null);
   }
 
   @Override
@@ -69,19 +79,25 @@ public class JSONParseSpec extends ParseSpec
   @Override
   public ParseSpec withTimestampSpec(TimestampSpec spec)
   {
-    return new JSONParseSpec(spec, getDimensionsSpec(), getFlattenSpec());
+    return new JSONParseSpec(spec, getDimensionsSpec(), getFlattenSpec(), getFeatureSpec());
   }
 
   @Override
   public ParseSpec withDimensionsSpec(DimensionsSpec spec)
   {
-    return new JSONParseSpec(getTimestampSpec(), spec, getFlattenSpec());
+    return new JSONParseSpec(getTimestampSpec(), spec, getFlattenSpec(), getFeatureSpec());
   }
 
   @JsonProperty
   public JSONPathSpec getFlattenSpec()
   {
     return flattenSpec;
+  }
+
+  @JsonProperty
+  public Map<String, Boolean> getFeatureSpec()
+  {
+    return featureSpec;
   }
 
   private List<JSONPathParser.FieldSpec> convertFieldSpecs(List<JSONPathFieldSpec> druidFieldSpecs)
