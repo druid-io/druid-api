@@ -91,4 +91,25 @@ public interface Row extends Comparable<Row>
    * @return the long value for the provided column name.
    */
   public long getLongMetric(String metric);
+
+  /**
+   * Returns the int value of the given metric column.
+   * <p/>
+   *
+   * @param metric the column name of the metric requested
+   *
+   * @return the int value for the provided column name.
+   */
+  public int getIntMetric(String metric);
+
+  /**
+   * Returns the double value of the given metric column.
+   * <p/>
+   *
+   * @param metric the column name of the metric requested
+   *
+   * @return the double value for the provided column name.
+   */
+  public double getDoubleMetric(String metric);
+
 }
