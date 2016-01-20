@@ -19,11 +19,10 @@
 
 package io.druid.data.input;
 
+import com.google.common.collect.ImmutableMap;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.google.common.collect.ImmutableMap;
 
 public class MapBasedRowTest
 {
@@ -32,17 +31,17 @@ public class MapBasedRowTest
   {
     MapBasedRow row = new MapBasedRow(
         new DateTime(),
-        ImmutableMap.<String,Object>builder()
-          .put("k0", "-1.2")
-          .put("k1", "1.23")
-          .put("k2", "1.8")
-          .put("k3", "1e5")
-          .put("k4", "9223372036854775806")
-          .put("k5", "-9223372036854775807")
-          .put("k6", "+9223372036854775802")
-          .build()
+        ImmutableMap.<String, Object>builder()
+            .put("k0", "-1.2")
+            .put("k1", "1.23")
+            .put("k2", "1.8")
+            .put("k3", "1e5")
+            .put("k4", "9223372036854775806")
+            .put("k5", "-9223372036854775807")
+            .put("k6", "+9223372036854775802")
+            .build()
     );
-    
+
     Assert.assertEquals(-1, row.getLongMetric("k0"));
     Assert.assertEquals(1, row.getLongMetric("k1"));
     Assert.assertEquals(1, row.getLongMetric("k2"));
@@ -50,5 +49,54 @@ public class MapBasedRowTest
     Assert.assertEquals(9223372036854775806L, row.getLongMetric("k4"));
     Assert.assertEquals(-9223372036854775807L, row.getLongMetric("k5"));
     Assert.assertEquals(9223372036854775802L, row.getLongMetric("k6"));
+  }
+
+  @Test
+  public void testGetIntMetricFromString()
+  {
+    MapBasedRow row = new MapBasedRow(
+        new DateTime(),
+        ImmutableMap.<String, Object>builder()
+            .put("k0", "-1.2")
+            .put("k1", "1.23")
+            .put("k2", "1.8")
+            .put("k3", "1e5")
+            .put("k4", "2,147,483,647")
+            .put("k5", "-2,147,483,648")
+            .put("k6", "+2147483647")
+            .build()
+    );
+
+    Assert.assertEquals(-1, row.getIntMetric("k0"));
+    Assert.assertEquals(1, row.getIntMetric("k1"));
+    Assert.assertEquals(1, row.getIntMetric("k2"));
+    Assert.assertEquals(100000, row.getIntMetric("k3"));
+    Assert.assertEquals(2147483647, row.getIntMetric("k4"));
+    Assert.assertEquals(-2147483648, row.getIntMetric("k5"));
+    Assert.assertEquals(2147483647, row.getIntMetric("k6"));
+  }
+
+
+  @Test
+  public void testGetDoubleMetricFromString()
+  {
+    MapBasedRow row = new MapBasedRow(
+        new DateTime(),
+        ImmutableMap.<String, Object>builder()
+            .put("k0", "-1.2")
+            .put("k1", "1.23")
+            .put("k2", "1.8")
+            .put("k3", "1e5")
+            .put("k4", String.valueOf(Double.MAX_VALUE))
+            .put("k5", "-2,147,483,648.123456789")
+            .build()
+    );
+
+    Assert.assertEquals(-1.2d, row.getDoubleMetric("k0"), 0.0d);
+    Assert.assertEquals(1.23d, row.getDoubleMetric("k1"), 0.0d);
+    Assert.assertEquals(1.8d, row.getDoubleMetric("k2"), 0.0d);
+    Assert.assertEquals(100000d, row.getDoubleMetric("k3"), 0.0d);
+    Assert.assertEquals(Double.MAX_VALUE, row.getDoubleMetric("k4"), 0.0d);
+    Assert.assertEquals(-2147483648.123456789d, row.getDoubleMetric("k5"), 0.0d);
   }
 }

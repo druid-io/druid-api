@@ -23,12 +23,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import com.metamx.common.IAE;
 import com.metamx.common.logger.Logger;
 import com.metamx.common.parsers.ParseException;
 import org.joda.time.DateTime;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -173,7 +171,8 @@ public class MapBasedRow implements Row
       return ((Number) metricValue).intValue();
     } else if (metricValue instanceof String) {
       try {
-        return Integer.valueOf(((String) metricValue).replace(",", ""));
+        String s = ((String) metricValue).replace(",", "");
+        return LONG_PAT.matcher(s).matches() ? Integer.valueOf(s) : Double.valueOf(s).intValue();
       }
       catch (Exception e) {
         throw new ParseException(e, "Unable to parse metrics[%s], value[%s]", metric, metricValue);
