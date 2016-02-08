@@ -49,7 +49,7 @@ public class DataSegmentPusherUtilTest
         );
 
         String storageDir = DataSegmentPusherUtil.getHdfsStorageDir(segment);
-        Assert.assertEquals("something/20111001T000000.000Z_20111002T000000.000Z/brand_new_version/0", storageDir);
+        Assert.assertEquals("something/20111001T000000.000Z_20111002T000000.000Z_brand_new_version_0", storageDir);
 
     }
 }
