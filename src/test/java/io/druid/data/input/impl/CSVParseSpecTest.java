@@ -37,7 +37,7 @@ public class CSVParseSpecTest
             null
         ),
         new DimensionsSpec(
-            Arrays.asList("a", "b"),
+            DimensionsSpec.getDefaultSchemas(Arrays.asList("a", "b")),
             Lists.<String>newArrayList(),
             Lists.<SpatialDimensionSchema>newArrayList()
         ),
@@ -56,7 +56,7 @@ public class CSVParseSpecTest
             null
         ),
         new DimensionsSpec(
-            Arrays.asList("a,", "b"),
+            DimensionsSpec.getDefaultSchemas(Arrays.asList("a,", "b")),
             Lists.<String>newArrayList(),
             Lists.<SpatialDimensionSchema>newArrayList()
         ),

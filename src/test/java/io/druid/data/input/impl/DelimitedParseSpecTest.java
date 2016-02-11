@@ -38,7 +38,7 @@ public class DelimitedParseSpecTest
   {
     DelimitedParseSpec spec = new DelimitedParseSpec(
         new TimestampSpec("abc", "iso", null),
-        new DimensionsSpec(Arrays.asList("abc"), null, null),
+        new DimensionsSpec(DimensionsSpec.getDefaultSchemas(Arrays.asList("abc")), null, null),
         "\u0001",
         "\u0002",
         Arrays.asList("abc")
@@ -53,7 +53,7 @@ public class DelimitedParseSpecTest
     Assert.assertEquals(Arrays.asList("abc"), serde.getColumns());
     Assert.assertEquals("\u0001", serde.getDelimiter());
     Assert.assertEquals("\u0002", serde.getListDelimiter());
-    Assert.assertEquals(Arrays.asList("abc"), serde.getDimensionsSpec().getDimensions());
+    Assert.assertEquals(Arrays.asList("abc"), serde.getDimensionsSpec().getDimensionNames());
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -66,7 +66,7 @@ public class DelimitedParseSpecTest
             null
         ),
         new DimensionsSpec(
-            Arrays.asList("a", "b"),
+            DimensionsSpec.getDefaultSchemas(Arrays.asList("a", "b")),
             Lists.<String>newArrayList(),
             Lists.<SpatialDimensionSchema>newArrayList()
         ),
@@ -86,7 +86,7 @@ public class DelimitedParseSpecTest
             null
         ),
         new DimensionsSpec(
-            Arrays.asList("a,", "b"),
+            DimensionsSpec.getDefaultSchemas(Arrays.asList("a,", "b")),
             Lists.<String>newArrayList(),
             Lists.<SpatialDimensionSchema>newArrayList()
         ),
@@ -105,7 +105,7 @@ public class DelimitedParseSpecTest
             null
         ),
         new DimensionsSpec(
-            Arrays.asList("a", "b"),
+            DimensionsSpec.getDefaultSchemas(Arrays.asList("a", "b")),
             Lists.<String>newArrayList(),
             Lists.<SpatialDimensionSchema>newArrayList()
         ),

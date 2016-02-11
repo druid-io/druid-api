@@ -24,29 +24,47 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.metamx.common.parsers.ParserUtils;
 
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
 
 public class DimensionsSpec
 {
-  private final List<String> dimensions;
+  private final List<DimensionSchema> dimensions;
   private final Set<String> dimensionExclusions;
   private final List<SpatialDimensionSchema> spatialDimensions;
+  private final Map<String, DimensionSchema> dimensionSchemaMap;
+
+  public static List<DimensionSchema> getDefaultSchemas(List<String> dimNames)
+  {
+    return Lists.transform(
+        dimNames,
+        new Function<String, DimensionSchema>()
+        {
+          @Override
+          public DimensionSchema apply(String input)
+          {
+            return new DimensionSchema(input);
+          }
+        }
+    );
+  }
 
   @JsonCreator
   public DimensionsSpec(
-      @JsonProperty("dimensions") List<String> dimensions,
+      @JsonProperty("dimensions") List<DimensionSchema> dimensions,
       @JsonProperty("dimensionExclusions") List<String> dimensionExclusions,
       @JsonProperty("spatialDimensions") List<SpatialDimensionSchema> spatialDimensions
   )
   {
     this.dimensions = dimensions == null
-                      ? Lists.<String>newArrayList()
+                      ? Lists.<DimensionSchema>newArrayList()
                       : Lists.newArrayList(dimensions);
 
     this.dimensionExclusions = (dimensionExclusions == null)
@@ -58,10 +76,17 @@ public class DimensionsSpec
                              : spatialDimensions;
 
     verify();
+
+    // Map for easy dimension name-based schema lookup
+    this.dimensionSchemaMap = new HashMap<>();
+    for (DimensionSchema schema : this.dimensions) {
+      dimensionSchemaMap.put(schema.getName(), schema);
+    }
   }
 
+
   @JsonProperty
-  public List<String> getDimensions()
+  public List<DimensionSchema> getDimensions()
   {
     return dimensions;
   }
@@ -78,12 +103,32 @@ public class DimensionsSpec
     return spatialDimensions;
   }
 
+  public List<String> getDimensionNames()
+  {
+    return Lists.transform(
+        dimensions,
+        new Function<DimensionSchema, String>()
+        {
+          @Override
+          public String apply(DimensionSchema input)
+          {
+            return input.getName();
+          }
+        }
+    );
+  }
+
+  public DimensionSchema getSchema(String dimension)
+  {
+    return dimensionSchemaMap.get(dimension);
+  }
+
   public boolean hasCustomDimensions()
   {
     return !(dimensions == null || dimensions.isEmpty());
   }
 
-  public DimensionsSpec withDimensions(List<String> dims)
+  public DimensionsSpec withDimensions(List<DimensionSchema> dims)
   {
     return new DimensionsSpec(dims, ImmutableList.copyOf(dimensionExclusions), spatialDimensions);
   }
@@ -104,12 +149,13 @@ public class DimensionsSpec
 
   private void verify()
   {
+    List<String> dimNames = getDimensionNames();
     Preconditions.checkArgument(
-        Sets.intersection(this.dimensionExclusions, Sets.newHashSet(this.dimensions)).isEmpty(),
+        Sets.intersection(this.dimensionExclusions, Sets.newHashSet(dimNames)).isEmpty(),
         "dimensions and dimensions exclusions cannot overlap"
     );
 
-    ParserUtils.validateFields(dimensions);
+    ParserUtils.validateFields(dimNames);
     ParserUtils.validateFields(dimensionExclusions);
     ParserUtils.validateFields(
         Iterables.transform(

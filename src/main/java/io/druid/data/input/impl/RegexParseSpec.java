@@ -51,7 +51,7 @@ public class RegexParseSpec extends ParseSpec
     this.columns = columns;
     this.pattern = pattern;
 
-    verify(dimensionsSpec.getDimensions());
+    verify(dimensionsSpec.getDimensionNames());
   }
 
   @JsonProperty

@@ -52,7 +52,7 @@ public class CSVParseSpec extends ParseSpec
 
     this.columns = columns;
 
-    verify(dimensionsSpec.getDimensions());
+    verify(dimensionsSpec.getDimensionNames());
   }
 
   @JsonProperty

@@ -41,7 +41,7 @@ public class JSONParseSpecTest {
     feature.put("ALLOW_UNQUOTED_CONTROL_CHARS", true);
     JSONParseSpec spec = new JSONParseSpec(
         new TimestampSpec("timestamp", "iso", null),
-        new DimensionsSpec(ImmutableList.of("bar", "foo"), null, null),
+        new DimensionsSpec(DimensionsSpec.getDefaultSchemas(ImmutableList.of("bar", "foo")), null, null),
         null,
         feature
     );

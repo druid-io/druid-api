@@ -19,34 +19,33 @@
 
 package io.druid.data.input.impl;
 
-import com.google.common.collect.Lists;
-import com.metamx.common.parsers.JSONToLowerParser;
-import com.metamx.common.parsers.Parser;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
 import junit.framework.Assert;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Map;
-
-public class JSONLowercaseParseSpecTest
+/**
+ */
+public class DimensionsSpecSerdeTest
 {
+  private final ObjectMapper mapper = new ObjectMapper();
+
   @Test
-  public void testLowercasing() throws Exception
+  public void testDimensionsSpecSerde() throws Exception
   {
-    JSONLowercaseParseSpec spec = new JSONLowercaseParseSpec(
-        new TimestampSpec(
-            "timestamp",
-            "auto",
-            null
+    String jsonStr = "{"
+                     + "\"dimensions\":[\"AAA\", \"BIX\", {\"name\":\"CCCP\", \"type\":\"FLOAT\"}]"
+                     + "}";
+
+    DimensionsSpec actual = mapper.readValue(
+        mapper.writeValueAsString(
+            mapper.readValue(jsonStr, DimensionsSpec.class)
         ),
-        new DimensionsSpec(
-            DimensionsSpec.getDefaultSchemas(Arrays.asList("A", "B")),
-            Lists.<String>newArrayList(),
-            Lists.<SpatialDimensionSchema>newArrayList()
-        )
+        DimensionsSpec.class
     );
-    Parser parser = spec.makeParser();
-    Map<String, Object> event = parser.parse("{\"timestamp\":\"2015-01-01\",\"A\":\"foo\"}");
-    Assert.assertEquals("foo", event.get("a"));
+
+
+    System.out.println("HELLO WORLD");
+
   }
 }
