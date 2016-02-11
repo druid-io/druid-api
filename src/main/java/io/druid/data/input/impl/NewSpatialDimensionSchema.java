@@ -24,33 +24,44 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
+ * NOTE: 
+ * This class should be deprecated after Druid supports configurable index types on dimensions.
+ * When that exists, this should be the implementation: https://github.com/druid-io/druid/issues/2622
+ * 
+ * This is a stop-gap solution to consolidate the dimension specs and remove the separate spatial 
+ * section in DimensionsSpec.
  */
-@Deprecated
-public class SpatialDimensionSchema
+public class NewSpatialDimensionSchema extends DimensionSchema
 {
-  private final String dimName;
   private final List<String> dims;
 
   @JsonCreator
-  public SpatialDimensionSchema(
-      @JsonProperty("dimName") String dimName,
+  public NewSpatialDimensionSchema(
+      @JsonProperty("name") String name,
       @JsonProperty("dims") List<String> dims
   )
   {
-    this.dimName = dimName;
+    super(name);
     this.dims = dims;
-  }
-
-  @JsonProperty
-  public String getDimName()
-  {
-    return dimName;
   }
 
   @JsonProperty
   public List<String> getDims()
   {
     return dims;
+  }
+
+  @Override
+  public String getTypeName()
+  {
+    return DimensionSchema.SPATIAL_TYPE_NAME;
+  }
+
+  @Override
+  @JsonIgnore
+  public ValueType getValueType()
+  {
+    return ValueType.STRING;
   }
 
   @Override
@@ -63,11 +74,8 @@ public class SpatialDimensionSchema
       return false;
     }
 
-    SpatialDimensionSchema that = (SpatialDimensionSchema) o;
+    NewSpatialDimensionSchema that = (NewSpatialDimensionSchema) o;
 
-    if (dimName != null ? !dimName.equals(that.dimName) : that.dimName != null) {
-      return false;
-    }
     return dims != null ? dims.equals(that.dims) : that.dims == null;
 
   }
@@ -75,8 +83,6 @@ public class SpatialDimensionSchema
   @Override
   public int hashCode()
   {
-    int result = dimName != null ? dimName.hashCode() : 0;
-    result = 31 * result + (dims != null ? dims.hashCode() : 0);
-    return result;
+    return dims != null ? dims.hashCode() : 0;
   }
 }
