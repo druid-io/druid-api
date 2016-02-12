@@ -53,7 +53,7 @@ public class JSONParseSpecTest {
     Assert.assertEquals("timestamp", serde.getTimestampSpec().getTimestampColumn());
     Assert.assertEquals("iso", serde.getTimestampSpec().getTimestampFormat());
 
-    Assert.assertEquals(Arrays.asList("bar", "foo"), serde.getDimensionsSpec().getDimensions());
+    Assert.assertEquals(Arrays.asList("bar", "foo"), serde.getDimensionsSpec().getDimensionNames());
     Assert.assertEquals(feature, serde.getFeatureSpec());
   }
 }

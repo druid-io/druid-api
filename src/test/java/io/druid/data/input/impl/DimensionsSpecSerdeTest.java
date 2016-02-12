@@ -24,6 +24,9 @@ import com.google.common.collect.ImmutableList;
 import junit.framework.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  */
 public class DimensionsSpecSerdeTest
@@ -33,8 +36,11 @@ public class DimensionsSpecSerdeTest
   @Test
   public void testDimensionsSpecSerde() throws Exception
   {
-    String jsonStr = "{"
-                     + "\"dimensions\":[\"AAA\", \"BIX\", {\"name\":\"CCCP\", \"type\":\"FLOAT\"}]"
+    String jsonStr = "{\"dimensions\":[\"AAA\", \"BIS\","
+                     + "{\"name\":\"CCCP\", \"type\":\"FLOAT\"}, {\"name\":\"DDT\", \"isSpatial\":true},"
+                     + "{\"name\":\"EEK\", \"subdimensions\":[\"X\",\"Y\",\"Z\"]}],"
+                     + "\"dimensionExclusions\": [\"FOO\", \"HAR\"],"
+                     + "\"spatialDimensions\": [{\"dimName\":\"IMPR\", \"dims\":[\"S\",\"P\",\"Q\",\"R\"]}]"
                      + "}";
 
     DimensionsSpec actual = mapper.readValue(
@@ -44,8 +50,25 @@ public class DimensionsSpecSerdeTest
         DimensionsSpec.class
     );
 
+    DimensionsSpec expected = new DimensionsSpec(
+        Arrays.asList(
+            new DimensionSchema("AAA"),
+            new DimensionSchema("BIS"),
+            new DimensionSchema("CCCP", DimensionSchema.ValueType.FLOAT, false, null),
+            new DimensionSchema("DDT", null, true, null),
+            new DimensionSchema("EEK", DimensionSchema.ValueType.STRING, false, Arrays.asList("X","Y","Z")),
+            new DimensionSchema("IMPR", null, true, Arrays.asList("S","P","Q","R"))
+        ),
+        Arrays.asList("FOO", "HAR"),
+        null
+    );
 
-    System.out.println("HELLO WORLD");
+    List<SpatialDimensionSchema> expectedSpatials = Arrays.asList(
+        new SpatialDimensionSchema("DDT", null),
+        new SpatialDimensionSchema("IMPR",Arrays.asList("S","P","Q","R"))
+    );
 
+    Assert.assertEquals(expected, actual);
+    Assert.assertEquals(expectedSpatials, actual.getSpatialDimensions());
   }
 }

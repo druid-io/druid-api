@@ -52,6 +52,6 @@ public class RegexParseSpecTest
 
     Assert.assertEquals("abc", serde.getPattern());
     Assert.assertEquals("\u0001", serde.getListDelimiter());
-    Assert.assertEquals(Arrays.asList("abc"), serde.getDimensionsSpec().getDimensions());
+    Assert.assertEquals(Arrays.asList("abc"), serde.getDimensionsSpec().getDimensionNames());
   }
 }
