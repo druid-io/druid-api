@@ -27,6 +27,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.metamx.common.IAE;
 import com.metamx.common.parsers.ParserUtils;
 
 import javax.annotation.Nullable;
@@ -45,7 +46,7 @@ public class DimensionsSpec
   private final Map<String, DimensionSchema> dimensionSchemaMap;
 
   @Deprecated
-  private final List<SpatialDimensionSchema> spatialDimensions;
+  private List<SpatialDimensionSchema> spatialDimensions;
 
   public static List<DimensionSchema> getDefaultSchemas(List<String> dimNames)
   {
@@ -93,16 +94,22 @@ public class DimensionsSpec
 
     verify();
 
-    for(SpatialDimensionSchema spatialSchema : this.spatialDimensions) {
-      this.dimensions.add(DimensionsSpec.convertSpatialSchema(spatialSchema));
-    }
-    this.spatialDimensions.clear();
-
     // Map for easy dimension name-based schema lookup
     this.dimensionSchemaMap = new HashMap<>();
     for (DimensionSchema schema : this.dimensions) {
       dimensionSchemaMap.put(schema.getName(), schema);
     }
+
+    for(SpatialDimensionSchema spatialSchema : this.spatialDimensions) {
+      DimensionSchema newSchema = DimensionsSpec.convertSpatialSchema(spatialSchema);
+      this.dimensions.add(newSchema);
+      dimensionSchemaMap.put(newSchema.getName(), newSchema);
+    }
+
+    this.spatialDimensions = null;
+    //this.spatialDimensions.clear();
+
+
   }
 
 
