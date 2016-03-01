@@ -24,6 +24,7 @@ import java.util.List;
 
 /**
  */
+@Deprecated
 public class SpatialDimensionSchema
 {
   private final String dimName;
@@ -49,5 +50,32 @@ public class SpatialDimensionSchema
   public List<String> getDims()
   {
     return dims;
+  }
+
+  @Override
+  public boolean equals(Object o)
+  {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    SpatialDimensionSchema that = (SpatialDimensionSchema) o;
+
+    if (!dimName.equals(that.dimName)) {
+      return false;
+    }
+    return dims != null ? dims.equals(that.dims) : that.dims == null;
+
+  }
+
+  @Override
+  public int hashCode()
+  {
+    int result = dimName.hashCode();
+    result = 31 * result + (dims != null ? dims.hashCode() : 0);
+    return result;
   }
 }

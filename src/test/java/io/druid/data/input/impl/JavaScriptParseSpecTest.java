@@ -38,7 +38,7 @@ public class JavaScriptParseSpecTest
   {
     JavaScriptParseSpec spec = new JavaScriptParseSpec(
         new TimestampSpec("abc", "iso", null),
-        new DimensionsSpec(Arrays.asList("abc"), null, null),
+        new DimensionsSpec(DimensionsSpec.getDefaultSchemas(Arrays.asList("abc")), null, null),
         "abc"
     );
     final JavaScriptParseSpec serde = jsonMapper.readValue(
@@ -49,6 +49,6 @@ public class JavaScriptParseSpecTest
     Assert.assertEquals("iso", serde.getTimestampSpec().getTimestampFormat());
 
     Assert.assertEquals("abc", serde.getFunction());
-    Assert.assertEquals(Arrays.asList("abc"), serde.getDimensionsSpec().getDimensions());
+    Assert.assertEquals(Arrays.asList("abc"), serde.getDimensionsSpec().getDimensionNames());
   }
 }

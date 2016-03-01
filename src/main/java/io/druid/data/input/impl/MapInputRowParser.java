@@ -46,7 +46,7 @@ public class MapInputRowParser implements InputRowParser<Map<String, Object>>
   public InputRow parse(Map<String, Object> theMap)
   {
     final List<String> dimensions = parseSpec.getDimensionsSpec().hasCustomDimensions()
-                                    ? parseSpec.getDimensionsSpec().getDimensions()
+                                    ? parseSpec.getDimensionsSpec().getDimensionNames()
                                     : Lists.newArrayList(
                                         Sets.difference(
                                             theMap.keySet(),
