@@ -25,11 +25,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.base.Preconditions;
-
-import java.util.List;
+import com.google.common.base.Strings;
 
 /**
  */
@@ -42,6 +39,15 @@ import java.util.List;
 })
 public abstract class DimensionSchema
 {
+  public static enum MultiValueHandling
+  {
+    SORTED_ARRAY,
+    ARRAY,
+    SET
+  }
+
+  public static final String DEFAULT_HANDLING = MultiValueHandling.SORTED_ARRAY.name();
+
   public static final String STRING_TYPE_NAME = "string";
   public static final String LONG_TYPE_NAME = "long";
   public static final String FLOAT_TYPE_NAME = "float";
@@ -72,17 +78,27 @@ public abstract class DimensionSchema
   }
 
   private final String name;
+  private final String multiValueHandling;
 
-  protected DimensionSchema(String name)
+  protected DimensionSchema(String name, String multiValueHandling)
   {
     this.name = Preconditions.checkNotNull(name, "Dimension name cannot be null.");
+    this.multiValueHandling = Strings.isNullOrEmpty(multiValueHandling) ? DEFAULT_HANDLING : multiValueHandling;
+    // validate
+    MultiValueHandling.valueOf(this.multiValueHandling);
   }
 
   @JsonProperty
   public String getName()
   {
     return name;
-  };
+  }
+
+  @JsonProperty
+  public String getMultiValueHandling()
+  {
+    return multiValueHandling;
+  }
 
   @JsonIgnore
   public abstract String getTypeName();
@@ -102,7 +118,7 @@ public abstract class DimensionSchema
 
     DimensionSchema that = (DimensionSchema) o;
 
-    return name.equals(that.name);
+    return name.equals(that.name) && multiValueHandling.equals(that.multiValueHandling);
 
   }
 

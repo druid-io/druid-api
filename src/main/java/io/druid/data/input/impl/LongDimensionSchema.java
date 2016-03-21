@@ -27,10 +27,16 @@ public class LongDimensionSchema extends DimensionSchema
 {
   @JsonCreator
   public LongDimensionSchema(
-      @JsonProperty("name") String name
+      @JsonProperty("name") String name,
+      @JsonProperty("multiValueHandling") String multiValueHandling
   )
   {
-    super(name);
+    super(name, multiValueHandling);
+  }
+
+  public LongDimensionSchema(String name)
+  {
+    super(name, null);
   }
 
   @Override
