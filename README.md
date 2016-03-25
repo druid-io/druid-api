@@ -1,4 +1,6 @@
-druid-api
-=========
+druid-api (MOVED)
+=================
 
-A repository for the Druid API.  This is a separate library that defines the APIs for Druid extensibility 
+This project has moved to https://github.com/druid-io/druid in the "api" module.
+
+Please do not open new pull requests in this repository.
