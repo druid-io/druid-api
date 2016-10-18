@@ -19,6 +19,8 @@
 
 package io.druid.data.input;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.joda.time.DateTime;
 
 import java.util.List;
@@ -40,9 +42,13 @@ public class MapBasedInputRow extends MapBasedRow implements InputRow
     this.dimensions = dimensions;
   }
 
+  @JsonCreator
   public MapBasedInputRow(
+      @JsonProperty("timestamp")
       DateTime timestamp,
+      @JsonProperty("dimensions")
       List<String> dimensions,
+      @JsonProperty("event")
       Map<String, Object> event
   )
   {
@@ -51,6 +57,7 @@ public class MapBasedInputRow extends MapBasedRow implements InputRow
   }
 
   @Override
+  @JsonProperty("dimensions")
   public List<String> getDimensions()
   {
     return dimensions;
