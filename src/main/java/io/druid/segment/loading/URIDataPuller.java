@@ -24,6 +24,7 @@ import com.google.common.base.Predicate;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.regex.Pattern;
 
 /**
  * A URIDataPuller has handlings for URI based data
@@ -59,4 +60,17 @@ public interface URIDataPuller
    * @return Predicate function indicating if the Throwable is recoverable
    */
   public Predicate<Throwable> shouldRetryPredicate();
+
+  /**
+   * Use `matchPattern` to filter and find the most up to date data for `uri`.
+   * It is expected that the URI has some form of hierarchy and the `matchPattern` is on the file name portion,
+   * but implementations may interpret the pattern in whatever way is appropriate. Calls to `getVersion(...)` should
+   * yield the correct version of the URI returned from this method.
+   *
+   * @param matchPattern A Pattern, whose exact functionality depends on the implementation, which is intended
+   *                     to assist the URIDataPuller in determining what other URIs might be alternate versions.
+   *
+   * @return A URI which the URIDataPuller believes is the most up to date version of the URI passed in. Returns `null` if no version is found
+   */
+  public URI getLatestVersion(URI uri, Pattern matchPattern);
 }
