@@ -29,10 +29,7 @@ public class DataSegmentPusherUtil
 {
   private static final Joiner JOINER = Joiner.on("/").skipNulls();
 
-  // Note: storage directory structure format = .../dataSource/interval/version/partitionNumber/
-  // If above format is ever changed, make sure to change it appropriately in other places
-  // e.g. HDFSDataSegmentKiller uses this information to clean the version, interval and dataSource directories
-  // on segment deletion if segment being deleted was the only segment
+
   public static String getStorageDir(DataSegment segment)
   {
     return JOINER.join(
@@ -47,6 +44,10 @@ public class DataSegmentPusherUtil
     );
   }
 
+  // Note: storage directory structure format
+  // If format is ever changed, make sure to change it appropriately in other places
+  // e.g. HDFSDataSegmentKiller uses this information to clean directories properly.
+  // on segment deletion if segment being deleted was the only segment
   /**
    * Due to https://issues.apache.org/jira/browse/HDFS-13 ":" are not allowed in
    * path names. So we format paths differently for HDFS.
@@ -56,12 +57,12 @@ public class DataSegmentPusherUtil
     return JOINER.join(
         segment.getDataSource(),
         String.format(
-            "%s_%s",
+            "%s_%s_%s_%s",
             segment.getInterval().getStart().toString(ISODateTimeFormat.basicDateTime()),
-            segment.getInterval().getEnd().toString(ISODateTimeFormat.basicDateTime())
-        ),
-        segment.getVersion().replaceAll(":", "_"),
-        segment.getShardSpec().getPartitionNum()
+            segment.getInterval().getEnd().toString(ISODateTimeFormat.basicDateTime()),
+            segment.getVersion().replaceAll(":", "_"),
+            segment.getShardSpec().getPartitionNum()
+        )
     );
   }
 }
