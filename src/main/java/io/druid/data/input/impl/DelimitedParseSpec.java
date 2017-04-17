@@ -19,14 +19,14 @@ package io.druid.data.input.impl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.metamx.common.parsers.DelimitedParser;
-import com.metamx.common.parsers.ParseException;
 import com.metamx.common.parsers.Parser;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -56,6 +56,23 @@ public class DelimitedParseSpec extends ParseSpec
     }
 
     verify(dimensionsSpec.getDimensionNames());
+  }
+
+  @VisibleForTesting
+  @SuppressWarnings("unchecked")
+  public DelimitedParseSpec(
+      TimestampSpec timestampSpec,
+      DimensionsSpec dimensionsSpec,
+      Map<String, Object> properties
+  )
+  {
+    this(
+        timestampSpec,
+        dimensionsSpec,
+        (String) properties.get("delimiter"),
+        (String) properties.get("listDelimiter"),
+        (List<String>) properties.get("columns")
+    );
   }
 
   @JsonProperty("delimiter")

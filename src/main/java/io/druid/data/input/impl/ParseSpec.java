@@ -34,7 +34,8 @@ import java.util.List;
     @JsonSubTypes.Type(name = "jsonLowercase", value = JSONLowercaseParseSpec.class),
     @JsonSubTypes.Type(name = "timeAndDims", value = TimeAndDimsParseSpec.class),
     @JsonSubTypes.Type(name = "regex", value = RegexParseSpec.class),
-    @JsonSubTypes.Type(name = "javascript", value = JavaScriptParseSpec.class)
+    @JsonSubTypes.Type(name = "javascript", value = JavaScriptParseSpec.class),
+    @JsonSubTypes.Type(name = "custom", value = CustomParseSpec.class)
 
 })
 public abstract class ParseSpec
