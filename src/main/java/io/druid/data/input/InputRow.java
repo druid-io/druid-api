@@ -28,8 +28,7 @@ import java.util.List;
  * implement "schema-less" data ingestion that allows the system to add new dimensions as they appear.
  *
  */
-public interface
-    InputRow extends Row
+public interface InputRow extends Row
 {
   /**
    * Returns the dimensions that exist in this row.
