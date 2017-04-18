@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * NOTE: 
@@ -41,7 +42,7 @@ public class NewSpatialDimensionSchema extends DimensionSchema
       @JsonProperty("dims") List<String> dims
   )
   {
-    super(name);
+    super(name, null);
     this.dims = dims;
   }
 
@@ -73,6 +74,9 @@ public class NewSpatialDimensionSchema extends DimensionSchema
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+    if (!super.equals(o)) {
+      return false;
+    }
 
     NewSpatialDimensionSchema that = (NewSpatialDimensionSchema) o;
 
@@ -83,6 +87,6 @@ public class NewSpatialDimensionSchema extends DimensionSchema
   @Override
   public int hashCode()
   {
-    return dims != null ? dims.hashCode() : 0;
+    return super.hashCode() * 31 + Objects.hashCode(dims);
   }
 }
